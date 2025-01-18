@@ -15,6 +15,11 @@ const companySchema = new mongoose.Schema(
       default: [],
       required: true,
     },
+    scaledReturns: {
+      type: [Number],
+      default: [],
+      required: true,
+    },
   },
   {
     timestamps: true,

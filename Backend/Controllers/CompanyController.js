@@ -1,7 +1,7 @@
 const Company = require("../Models/Company");
 
 const addCompanies = async (req, res) => {
-  const { name, code, returns } = req.body;
+  const { name, code, returns, scaledReturns } = req.body;
   if (!name) {
     return res.status(400).json({ message: "Name is required" });
   }
@@ -11,13 +11,16 @@ const addCompanies = async (req, res) => {
   if (!returns) {
     return res.status(400).json({ message: "Returns is required" });
   }
+  if (!scaledReturns) {
+    return res.status(400).json({ message: "Scaled Returns is required" });
+  }
   //check if company already exists
   const duplicate = await Company.findOne({ code });
   if (duplicate) {
     return res.status(400).json({ message: "Company already exists" });
   }
   try {
-    const company = new Company({ name, code, returns });
+    const company = new Company({ name, code, returns, scaledReturns });
     await company.save();
     res.status(201).json(company);
   } catch (error) {
