@@ -1,28 +1,31 @@
 const Company = require("../Models/Company");
 
 const addCompanies = async (req, res) => {
-  const { name, code, returns, scaledReturns } = req.body;
-  if (!name) {
-    return res.status(400).json({ message: "Name is required" });
+  const companiesData = req.body;
+
+  if (!Array.isArray(companiesData) || companiesData.length === 0) {
+    return res.status(400).json({
+      message: "Invalid data format. Expected an array of companies.",
+    });
   }
-  if (!code) {
-    return res.status(400).json({ message: "Code is required" });
-  }
-  if (!returns) {
-    return res.status(400).json({ message: "Returns is required" });
-  }
-  if (!scaledReturns) {
-    return res.status(400).json({ message: "Scaled Returns is required" });
-  }
-  //check if company already exists
-  const duplicate = await Company.findOne({ code });
-  if (duplicate) {
-    return res.status(400).json({ message: "Company already exists" });
+
+  for (let company of companiesData) {
+    const { name, code, returns, scaledReturns } = company;
+
+    if (!name || !code || !returns || !scaledReturns) {
+      return res.status(400).json({
+        message: "Invalid data format. Expected an array of companies.",
+      });
+    }
+
+    const duplicate = await Company.findOne({ code });
+    if (duplicate) {
+      return res.status(400).json({ message: "Duplicate company code.", code });
+    }
   }
   try {
-    const company = new Company({ name, code, returns, scaledReturns });
-    await company.save();
-    res.status(201).json(company);
+    const companies = await Company.insertMany(companiesData);
+    res.status(200).json(companies);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

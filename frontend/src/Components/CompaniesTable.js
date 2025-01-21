@@ -7,14 +7,17 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-// import Accordion from "@mui/material/Accordion";
-// import AccordionActions from "@mui/material/AccordionActions";
-// import AccordionSummary from "@mui/material/AccordionSummary";
-// import AccordionDetails from "@mui/material/AccordionDetails";
-// import Typography from "@mui/material/Typography";
-// import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-// import Button from "@mui/material/Button";
+import Button from "@mui/material/Button";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import AddIcon from "@mui/icons-material/Add";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -45,18 +48,96 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const CompanyTable = () => {
   const [companies, setCompanies] = useState([]);
-  const [fields, setFields] = useState([{ name: "" }]);
+  const [expanded, setExpanded] = useState(false);
+  const [fields, setFields] = useState([
+    { name: "", code: "", returns: [], scaledReturns: [] },
+  ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const addField = () => {
-    setFields([...fields, { name: "" }]);
+    setFields([
+      ...fields,
+      { name: "", code: "", returns: [], scaledReturns: [] },
+    ]);
   };
 
-  const handleFieldChange = (index, event) => {
+  const addReturnField = (index) => {
     const updatedFields = [...fields];
-    updatedFields[index].name = event.target.value; // Update the specific field
+    updatedFields[index].returns.push(0);
     setFields(updatedFields);
+  };
+
+  const handleReturnChange = (fieldIndex, returnIndex, event) => {
+    const updatedFields = [...fields];
+    updatedFields[fieldIndex].returns[returnIndex] = event.target.value;
+    setFields(updatedFields);
+  };
+
+  const handleChange = (index, event, field) => {
+    const updatedFields = [...fields];
+
+    if (field === "name") {
+      updatedFields[index].name = event.target.value;
+    } else if (field === "code") {
+      updatedFields[index].code = event.target.value;
+    }
+
+    setFields(updatedFields);
+  };
+
+  const removeField = (index) => {
+    const updatedFields = [...fields];
+    updatedFields.splice(index, 1);
+    setFields(updatedFields);
+  };
+
+  const removeReturnField = (fieldIndex, returnIndex) => {
+    const updatedFields = [...fields];
+    updatedFields[fieldIndex].returns.splice(returnIndex, 1);
+    setFields(updatedFields);
+  };
+
+  const calculateScaledReturn = (value) => {
+    const numericValue = parseFloat(value);
+
+    if (isNaN(numericValue)) return 0;
+
+    if (numericValue < 0) {
+      return 1 - Math.abs(numericValue) / 100;
+    } else {
+      return 1 + numericValue / 100;
+    }
+  };
+
+  const saveData = async () => {
+    const updatedFields = fields.map((field) => {
+      const scaledReturns = field.returns.map((value) =>
+        calculateScaledReturn(value)
+      );
+      return { ...field, scaledReturns };
+    });
+
+    setFields(updatedFields);
+
+    const isValid = updatedFields.every(
+      (field) => field.scaledReturns.length === field.returns.length
+    );
+
+    if (!isValid) {
+      console.error("Error: Scaled Returns are missing for some fields.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/api/companies/add`,
+        updatedFields
+      );
+      console.log("Data saved successfully:", response.data);
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
   };
 
   const fetchAllCompanies = async () => {
@@ -75,6 +156,7 @@ const CompanyTable = () => {
     fetchAllCompanies();
   }, []);
   console.log("Companies: ", companies);
+  console.log("Fields: ", fields);
 
   const maxReturnsLength = Math.max(
     ...companies.map((company) => company.returns.length)
@@ -112,20 +194,80 @@ const CompanyTable = () => {
           </Table>
         </TableContainer>
       </div>
-      <div>
-        <h3>Dynamic Name Fields</h3>
-        {fields.map((field, index) => (
-          <div key={index} style={{ marginBottom: "10px" }}>
-            <label>Name {index + 1}:</label>
-            <input
-              type="text"
-              value={field.name}
-              onChange={(event) => handleFieldChange(index, event)} // Handle change of each field
-              placeholder={`Enter Name ${index + 1}`}
-            />
+      <div className="Accordion">
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ArrowDownwardIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography component="span">Add Company</Typography>
+          </AccordionSummary>
+          <div>
+            <Button onClick={() => addField()}>{<AddIcon />}</Button>
           </div>
-        ))}
-        <button onClick={addField}>+ Add Name Field</button>
+          <div>
+            <AccordionDetails>
+              {fields.map((field, fieldIndex) => (
+                <div key={fieldIndex}>
+                  <div>
+                    <span>Name</span>
+                    <input
+                      type="text"
+                      value={field.name}
+                      onChange={(event) =>
+                        handleChange(fieldIndex, event, "name")
+                      }
+                    />
+                    <span>Code</span>
+                    <input
+                      type="text"
+                      value={field.code}
+                      onChange={(event) =>
+                        handleChange(fieldIndex, event, "code")
+                      }
+                    />
+                    <div>
+                      <Button onClick={() => removeField(fieldIndex)}>
+                        {<RemoveIcon />}
+                      </Button>
+                    </div>
+                    <span>Returns</span>
+                    {field.returns.map((returnValue, returnIndex) => (
+                      <div>
+                        <div key={returnIndex}>
+                          <input
+                            type="Number"
+                            placeholder={`Return ${returnIndex + 1}`}
+                            value={returnValue}
+                            onChange={(event) =>
+                              handleReturnChange(fieldIndex, returnIndex, event)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Button onClick={() => removeReturnField(fieldIndex)}>
+                            Remove Return Value
+                          </Button>
+                        </div>
+                      </div>
+                    ))}{" "}
+                    <div>
+                      <div>
+                        <Button onClick={() => addReturnField(fieldIndex)}>
+                          Add Return Value
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </AccordionDetails>
+          </div>
+        </Accordion>
+      </div>
+      <div>
+        <Button onClick={saveData}>Confirm</Button>
       </div>
     </div>
   );
