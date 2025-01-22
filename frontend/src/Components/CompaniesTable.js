@@ -18,6 +18,9 @@ import Typography from "@mui/material/Typography";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddIcon from "@mui/icons-material/Add";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
+import "./CompaniesTable.css";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -54,6 +57,8 @@ const CompanyTable = () => {
   ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [alert, setAlert] = useState({ message: "", severity: "" }); //
+  const [showAlert, setShowAlert] = useState(false);
 
   const addField = () => {
     setFields([
@@ -110,7 +115,24 @@ const CompanyTable = () => {
     }
   };
 
+  const validateFields = () => {
+    for (const field of fields) {
+      if (!field.name || !field.code) {
+        setShowAlert(true);
+        setAlert({ message: "Name and Code are required!", severity: "error" });
+        return false;
+      }
+      if (field.returns.some((value) => isNaN(value) || value === "")) {
+        setShowAlert(true);
+        setAlert({ message: "Returns should be numbers!", severity: "error" });
+        return false;
+      }
+    }
+    return true;
+  };
+
   const saveData = async () => {
+    if (!validateFields()) return;
     const updatedFields = fields.map((field) => {
       const scaledReturns = field.returns.map((value) =>
         calculateScaledReturn(value)
@@ -125,7 +147,8 @@ const CompanyTable = () => {
     );
 
     if (!isValid) {
-      console.error("Error: Scaled Returns are missing for some fields.");
+      setShowAlert(true);
+      setAlert({ message: "Scaled Returns are missing", severity: "error" });
       return;
     }
 
@@ -134,9 +157,12 @@ const CompanyTable = () => {
         `${baseUrl}/api/companies/add`,
         updatedFields
       );
-      console.log("Data saved successfully:", response.data);
+      setShowAlert(true);
+      setAlert({ message: "Data saved successfully", severity: "success" });
+      await fetchAllCompanies();
     } catch (error) {
-      console.error("Error saving data:", error);
+      setShowAlert(true);
+      setAlert({ message: error.response.data, severity: "error" });
     }
   };
 
@@ -163,8 +189,26 @@ const CompanyTable = () => {
   ); // stores length of each company's returns
 
   return (
-    <div>
-      <div className="Companies">
+    <div className="container">
+      {alert.message && showAlert && (
+        <Stack sx={{ width: "100%", mb: 2 }} spacing={2}>
+          <Alert
+            severity={alert.severity}
+            action={
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => setShowAlert(false)}
+              >
+                Close
+              </Button>
+            }
+          >
+            {alert.message}
+          </Alert>
+        </Stack>
+      )}
+      <div className="companies-section">
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             {/* Table Header */}
@@ -194,7 +238,6 @@ const CompanyTable = () => {
             </TableHead>
             {/* Table Body */}
             <TableBody>
-              {/* For each row, loop through up to the longest array of returns */}
               {Array.from({ length: maxReturnsLength }).map((_, rowIndex) => (
                 <StyledTableRow key={rowIndex}>
                   {companies.map((company, columnIndex) => (
@@ -219,7 +262,7 @@ const CompanyTable = () => {
           </Table>
         </TableContainer>
       </div>
-      <div className="Accordion">
+      <div className="accordion-section">
         <Accordion>
           <AccordionSummary
             expandIcon={<ArrowDownwardIcon />}
@@ -228,71 +271,79 @@ const CompanyTable = () => {
           >
             <Typography component="span">Add Company</Typography>
           </AccordionSummary>
-          <div>
-            <Button onClick={() => addField()}>{<AddIcon />}</Button>
-          </div>
-          <div>
-            <AccordionDetails>
-              {fields.map((field, fieldIndex) => (
-                <div key={fieldIndex}>
-                  <div>
-                    <span>Name</span>
-                    <input
-                      type="text"
-                      value={field.name}
-                      onChange={(event) =>
-                        handleChange(fieldIndex, event, "name")
-                      }
-                    />
-                    <span>Code</span>
-                    <input
-                      type="text"
-                      value={field.code}
-                      onChange={(event) =>
-                        handleChange(fieldIndex, event, "code")
-                      }
-                    />
-                    <div>
-                      <Button onClick={() => removeField(fieldIndex)}>
-                        {<RemoveIcon />}
+          <AccordionDetails>
+            <div className="accordion-buttons">
+              <Button className="add-field-btn" onClick={() => addField()}>
+                <AddIcon />
+                Add New Field
+              </Button>
+            </div>
+            {fields.map((field, fieldIndex) => (
+              <div key={fieldIndex} className="field-container">
+                <div className="field-inputs">
+                  <span className="input-label">Name</span>
+                  <input
+                    className="input-field"
+                    type="text"
+                    value={field.name}
+                    onChange={(event) =>
+                      handleChange(fieldIndex, event, "name")
+                    }
+                  />
+                  <span className="input-label">Code</span>
+                  <input
+                    className="input-field"
+                    type="text"
+                    value={field.code}
+                    onChange={(event) =>
+                      handleChange(fieldIndex, event, "code")
+                    }
+                  />
+                  <Button
+                    className="remove-field-btn"
+                    onClick={() => removeField(fieldIndex)}
+                  >
+                    <RemoveIcon />
+                    Remove Company
+                  </Button>
+                </div>
+                <div className="returns-section">
+                  <span className="input-label">Returns</span>
+                  {field.returns.map((returnValue, returnIndex) => (
+                    <div className="return-field" key={returnIndex}>
+                      <input
+                        className="input-return"
+                        type="number"
+                        placeholder={`Return ${returnIndex + 1}`}
+                        value={returnValue}
+                        onChange={(event) =>
+                          handleReturnChange(fieldIndex, returnIndex, event)
+                        }
+                      />
+                      <Button
+                        className="remove-return-btn"
+                        onClick={() => removeReturnField(fieldIndex)}
+                      >
+                        Remove
                       </Button>
                     </div>
-                    <span>Returns</span>
-                    {field.returns.map((returnValue, returnIndex) => (
-                      <div>
-                        <div key={returnIndex}>
-                          <input
-                            type="number"
-                            placeholder={`Return ${returnIndex + 1}`}
-                            value={returnValue}
-                            onChange={(event) =>
-                              handleReturnChange(fieldIndex, returnIndex, event)
-                            }
-                          />
-                        </div>
-                        <div>
-                          <Button onClick={() => removeReturnField(fieldIndex)}>
-                            Remove Return Value
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    <div>
-                      <div>
-                        <Button onClick={() => addReturnField(fieldIndex)}>
-                          Add Return Value
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
+                  <Button
+                    className="add-return-btn"
+                    onClick={() => addReturnField(fieldIndex)}
+                  >
+                    Add Return Value
+                  </Button>
                 </div>
-              ))}
-            </AccordionDetails>
-          </div>
+              </div>
+            ))}
+          </AccordionDetails>
         </Accordion>
       </div>
-      <div>
-        <Button onClick={saveData}>Confirm</Button>
+      <div className="confirm-section">
+        <Button className="confirm-btn" onClick={saveData}>
+          Confirm
+        </Button>
       </div>
     </div>
   );

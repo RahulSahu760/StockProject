@@ -4,7 +4,7 @@ const addCompanies = async (req, res) => {
   const companiesData = req.body;
 
   if (!Array.isArray(companiesData) || companiesData.length === 0) {
-    return res.status(400).json({
+    return res.status(400).send({
       message: "Invalid data format. Expected an array of companies.",
     });
   }
@@ -13,21 +13,21 @@ const addCompanies = async (req, res) => {
     const { name, code, returns, scaledReturns } = company;
 
     if (!name || !code || !returns || !scaledReturns) {
-      return res.status(400).json({
+      return res.status(400).send({
         message: "Invalid data format. Expected an array of companies.",
       });
     }
 
     const duplicate = await Company.findOne({ code });
     if (duplicate) {
-      return res.status(400).json({ message: "Duplicate company code.", code });
+      return res.status(400).send({ message: "Duplicate company code.", code });
     }
   }
   try {
     const companies = await Company.insertMany(companiesData);
     res.status(200).json(companies);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).send({ message: error.message });
   }
 };
 
@@ -36,7 +36,7 @@ const getCompanies = async (req, res) => {
     const companies = await Company.find();
     res.status(200).json(companies);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).send({ message: error.message });
   }
 };
 

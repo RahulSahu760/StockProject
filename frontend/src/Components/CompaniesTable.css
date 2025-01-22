@@ -1,128 +1,163 @@
-/* General Styles */
-body {
-  font-family: "Roboto", sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f6f8;
+/* General Container Styling */
+.container {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Alert Section */
+.alert-message {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* Companies Table Styling */
+.companies-section {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background-color: #e3f2fd;
+}
+
+td {
+  background-color: #ffffff;
+}
+
+.styled-table-cell {
+  font-weight: bold;
+  color: #1d3557;
+}
+
+.styled-table-row:hover {
+  background-color: #f0f4f8;
+}
+
+/* Accordion Styling */
+.accordion-section {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.accordion-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.add-field-btn {
+  background-color: #c8ff00;
+  color: white;
+  &:hover {
+    background-color: #e4ff9a;
+  }
+}
+
+/* Input Fields */
+.field-container {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.field-inputs {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.input-label {
+  font-size: 14px;
+  font-weight: bold;
   color: #333;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #ffffff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
-
-/* Table Styles */
-.MuiTableContainer-root {
-  margin-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
-
-.MuiTable-root {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.MuiTableHead-root th {
-  background-color: #1976d2;
-  color: #ffffff;
-  font-size: 16px;
-  text-align: center;
-}
-
-.MuiTableBody-root tr:nth-of-type(odd) {
-  background-color: #f9f9f9;
-}
-
-.MuiTableCell-root {
-  text-align: center;
-  padding: 16px;
+.input-field {
+  padding: 8px;
   font-size: 14px;
-}
-
-/* Accordion Styles */
-.MuiAccordion-root {
-  margin-bottom: 20px;
-  background: #f8fafc;
-  box-shadow: none;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 4px;
+  outline: none;
 }
 
-.MuiAccordionSummary-root {
-  background-color: #e3f2fd;
-  border-bottom: 1px solid #ddd;
-  font-size: 16px;
-  font-weight: bold;
+.input-field:focus {
+  border-color: #77b5eb;
 }
 
-.MuiAccordionDetails-root {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
+.returns-section {
+  margin-top: 15px;
 }
 
-/* Input and Button Styles */
-input[type="text"],
-input[type="number"] {
-  width: 200px;
-  padding: 10px;
-  margin: 5px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+.input-return {
+  padding: 8px;
   font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 10px;
+  outline: none;
 }
 
-button {
-  background-color: #1976d2;
+.add-return-btn,
+.remove-return-btn {
+  background-color: #b2e0b3;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  margin: 5px;
-  border-radius: 5px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #155a9a;
-}
-
-button svg {
-  vertical-align: middle;
-  margin-right: 5px;
-}
-
-/* Alert Styles */
-.MuiAlert-root {
-  margin-bottom: 20px;
+  margin-top: 10px;
+  padding: 8px 15px;
   border-radius: 5px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
+.add-return-btn:hover,
+.remove-return-btn:hover {
+  background-color: #91dd95;
+}
 
-  input[type="text"],
-  input[type="number"] {
-    width: 100%;
-  }
+.remove-field-btn {
+  background-color: #e53935;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
 
-  button {
-    width: 100%;
-    padding: 10px;
-  }
+.remove-field-btn:hover {
+  background-color: #fd9696;
+}
 
-  .MuiAccordionDetails-root {
-    gap: 10px;
-  }
+/* Confirm Button Styling */
+.confirm-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.confirm-btn {
+  background-color: #78b3e7;
+  color: white;
+  padding: 12px 30px;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.confirm-btn:hover {
+  background-color: #8cb9ec;
 }
