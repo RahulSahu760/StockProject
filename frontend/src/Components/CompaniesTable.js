@@ -171,9 +171,24 @@ const CompanyTable = () => {
             <TableHead>
               <TableRow>
                 {companies.map((company, index) => (
-                  <StyledTableCell key={index} align="center">
+                  <StyledTableCell key={index} align="center" colSpan={2}>
                     {company.name}
                   </StyledTableCell>
+                ))}
+              </TableRow>
+              <TableRow>
+                {companies.map((_, index) => (
+                  <>
+                    <StyledTableCell key={`returns-${index}`} align="center">
+                      Returns
+                    </StyledTableCell>
+                    <StyledTableCell
+                      key={`scaledReturns-${index}`}
+                      align="center"
+                    >
+                      Scaled Returns
+                    </StyledTableCell>
+                  </>
                 ))}
               </TableRow>
             </TableHead>
@@ -183,10 +198,20 @@ const CompanyTable = () => {
               {Array.from({ length: maxReturnsLength }).map((_, rowIndex) => (
                 <StyledTableRow key={rowIndex}>
                   {companies.map((company, columnIndex) => (
-                    <StyledTableCell key={columnIndex} align="center">
-                      {company.returns[rowIndex] || "--"}{" "}
-                      {/* Handle if a company has fewer return values */}
-                    </StyledTableCell>
+                    <>
+                      <StyledTableCell
+                        key={`returns-${columnIndex}-${rowIndex}`}
+                        align="center"
+                      >
+                        {company.returns[rowIndex] || "--"}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        key={`scaledReturns-${columnIndex}-${rowIndex}`}
+                        align="center"
+                      >
+                        {company.scaledReturns[rowIndex] || "--"}
+                      </StyledTableCell>
+                    </>
                   ))}
                 </StyledTableRow>
               ))}
@@ -237,7 +262,7 @@ const CompanyTable = () => {
                       <div>
                         <div key={returnIndex}>
                           <input
-                            type="Number"
+                            type="number"
                             placeholder={`Return ${returnIndex + 1}`}
                             value={returnValue}
                             onChange={(event) =>
@@ -251,7 +276,7 @@ const CompanyTable = () => {
                           </Button>
                         </div>
                       </div>
-                    ))}{" "}
+                    ))}
                     <div>
                       <div>
                         <Button onClick={() => addReturnField(fieldIndex)}>
