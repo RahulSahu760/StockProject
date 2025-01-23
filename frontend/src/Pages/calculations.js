@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Calculations.css";
 import axios from "axios";
-//import CompanyTable from "../Components/CompanyTable";
+import CompanyTable from "../Components/CompanyTable";
 import Alert from "@mui/material/Alert";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
@@ -15,7 +15,12 @@ const baseUrl = process.env.REACT_APP_BACKEND_URL;
 const Calculations = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [companies, setCompanies] = useState([]);
+  const [selectedScaledValues, setSelectedScaledValues] = useState([]);
   const [alert, setAlert] = useState({ message: "", severity: "" });
+
+  const handleScaledValueChange = (updatedValues) => {
+    setSelectedScaledValues(updatedValues);
+  };
 
   const fetchCompanies = async () => {
     try {
@@ -58,8 +63,10 @@ const Calculations = () => {
       <div className="calculations-content">
         {selectedCompany ? (
           <div>
-            <h2>{selectedCompany.name} - Calculations</h2>
-            <p>Returns: {selectedCompany.returns.join(", ")}</p>
+            <CompanyTable
+              data={selectedCompany}
+              onScaledValueChange={handleScaledValueChange}
+            />
             {/* Add calculation logic here later */}
             <div>
               <button

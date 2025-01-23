@@ -1,0 +1,57 @@
+.CalculationTable-container {
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.CalculationTable-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.CalculationTable-container thead {
+  background-color: #000;
+  color: #fff;
+}
+
+.CalculationTable-container thead th {
+  padding: 10px 15px;
+  text-align: left;
+  font-weight: bold;
+  border: 1px solid #ddd;
+}
+
+.CalculationTable-container tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.CalculationTable-container tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.CalculationTable-container tbody tr:hover {
+  background-color: #e6e6e6;
+}
+
+.CalculationTable-container tbody td {
+  padding: 10px 15px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.CalculationTable-container tbody td:first-child {
+  font-weight: bold;
+}
+
+.CalculationTable-container tbody tr:last-child {
+  border-bottom: none;
+}
+
+.CalculationTable-container table th,
+.CalculationTable-container table td {
+  transition: all 0.3s ease-in-out;
+}
