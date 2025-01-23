@@ -1,13 +1,16 @@
 import "./App.css";
 import { Routes, Route, Link } from "react-router-dom";
 import Companies from "./Pages/Companies";
-
+import DashboardLayout from "./Components/Dashboard";
+import Calculations from "./Pages/calculations";
 function App() {
   return (
     <div className="App">
-      <h1>Stock Project</h1>
       <Routes>
-        <Route path="/Companies" element={<Companies />} />
+        <Route path="/" element={<DashboardLayout />}>
+          <Route path="/companies" element={<Companies />} />
+          <Route path="/calculations" element={<Calculations />} />
+        </Route>
       </Routes>
     </div>
   );

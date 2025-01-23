@@ -1,0 +1,95 @@
+/* General Layout */
+.dashboard {
+  display: flex;
+  height: 100vh;
+  background-color: #3f4e5c;
+  font-family: "Arial", sans-serif;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+  width: 250px;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  color: #ecf0f1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.dashboard-sidebar-header h2 {
+  color: #ecf0f1;
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+}
+
+.dashboard-nav-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #283949;
+}
+
+.dashboard-nav-menu li {
+  margin: 15px 0;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.dashboard-nav-menu li:hover {
+  background-color: #23313f;
+}
+
+.dashboard-nav-menu li.active {
+  background-color: #1e2a36;
+}
+
+.dashboard-nav-menu a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.dashboard-nav-menu a:hover {
+  color: #ecf0f1;
+}
+
+/* Content Area */
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dashboard-content-header h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.dashboard-content-body {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Component */
+.card {
+  background-color: #ecf0f1;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.card h2 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+}
+
+.card p {
+  margin: 0;
+  color: #7f8c8d;
+}

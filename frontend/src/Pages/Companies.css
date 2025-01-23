@@ -1,0 +1,57 @@
+.Companies {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%; /* Ensures it fits the parent container */
+  max-width: 1200px; /* Optional: Set a max width for larger screens */
+  margin: 0 auto; /* Centers the component horizontally */
+  padding: 20px; /* Adds padding for spacing */
+  box-sizing: border-box; /* Includes padding in width/height calculations */
+}
+
+.Companies h1 {
+  font-size: 2rem; /* Adjusts heading size */
+  text-align: center;
+  margin-bottom: 20px; /* Adds space below the heading */
+}
+
+.CompanyTable {
+  width: 100%; /* Ensures the table fits within the div */
+  max-width: 100%; /* Prevents overflow */
+  overflow-x: auto; /* Allows horizontal scrolling if necessary */
+  border-collapse: collapse; /* Combines table borders */
+  border: 1px solid #ccc; /* Adds a border to the table */
+}
+
+.CompanyTable th,
+.CompanyTable td {
+  padding: 10px; /* Adds space inside table cells */
+  text-align: left; /* Aligns text to the left */
+  border: 1px solid #ddd; /* Adds a border between table cells */
+}
+
+.CompanyTable th {
+  background-color: #f5f5f5; /* Gives a light background to the header */
+  font-weight: bold;
+}
+
+.CompanyTable tbody tr:nth-child(even) {
+  background-color: #f9f9f9; /* Adds a zebra-stripe effect */
+}
+
+.CompanyTable tbody tr:hover {
+  background-color: #f1f1f1; /* Highlights row on hover */
+}
+
+/* Responsive styling for smaller screens */
+@media (max-width: 768px) {
+  .Companies h1 {
+    font-size: 1.5rem; /* Reduces heading size on smaller screens */
+  }
+
+  .CompanyTable th,
+  .CompanyTable td {
+    padding: 8px; /* Reduces padding for table cells */
+  }
+}

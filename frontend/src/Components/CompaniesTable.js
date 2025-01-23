@@ -251,6 +251,7 @@ const CompanyTable = () => {
                       <StyledTableCell
                         key={`scaledReturns-${columnIndex}-${rowIndex}`}
                         align="center"
+                        style={{ borderRight: "1px solid #ddd" }}
                       >
                         {company.scaledReturns[rowIndex] || "--"}
                       </StyledTableCell>
