@@ -22,6 +22,8 @@ const Calculations = () => {
     setSelectedScaledValues(updatedValues);
   };
 
+  console.log("selectedScaledValues", selectedScaledValues);
+
   const fetchCompanies = async () => {
     try {
       const response = await axios.get(`${baseUrl}/api/companies/fetch`);
@@ -67,18 +69,6 @@ const Calculations = () => {
               data={selectedCompany}
               onScaledValueChange={handleScaledValueChange}
             />
-            {/* Add calculation logic here later */}
-            <div>
-              <button
-                onClick={() =>
-                  alert(
-                    "Perform calculation logic here for CAGR/Standard Deviation"
-                  )
-                }
-              >
-                Calculate
-              </button>
-            </div>
           </div>
         ) : (
           <h2>Select a company from the sidebar to perform calculations</h2>
