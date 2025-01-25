@@ -1,57 +1,56 @@
-.CalculationTable-container {
-  margin: 20px auto;
-  padding: 10px;
-  background-color: #fff;
+.CompanyTable-container {
+  padding: 16px;
+  background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.CalculationTable-container table {
+.CompanyTable-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
-
-.CalculationTable-container thead {
-  background-color: #000;
-  color: #fff;
-}
-
-.CalculationTable-container thead th {
-  padding: 10px 15px;
-  text-align: left;
-  font-weight: bold;
+  background-color: white;
   border: 1px solid #ddd;
 }
 
-.CalculationTable-container tbody tr {
-  border-bottom: 1px solid #ddd;
+.CompanyTable-headerRow {
+  background-color: #222324;
 }
 
-.CalculationTable-container tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.CalculationTable-container tbody tr:hover {
-  background-color: #e6e6e6;
-}
-
-.CalculationTable-container tbody td {
-  padding: 10px 15px;
-  text-align: left;
-  border: 1px solid #ddd;
-}
-
-.CalculationTable-container tbody td:first-child {
+.CompanyTable-headerCell {
   font-weight: bold;
+  text-align: left;
+  padding: 12px;
+  border: 1px solid #ddd;
+  color: #333;
 }
 
-.CalculationTable-container tbody tr:last-child {
-  border-bottom: none;
+.CompanyTable-columnRow {
+  background-color: #eef1f5;
 }
 
-.CalculationTable-container table th,
-.CalculationTable-container table td {
-  transition: all 0.3s ease-in-out;
+.CompanyTable-columnHeader {
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  color: #555;
+}
+
+.CompanyTable-dataRow:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.CompanyTable-dataRow:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.CompanyTable-dataCell {
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  color: #444;
+}
+
+.CompanyTable-dataCell:first-child {
+  text-align: left;
 }

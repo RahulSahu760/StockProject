@@ -1,116 +1,87 @@
-import React, { useState, useMemo } from "react";
-import { useTable } from "react-table";
+import React from "react";
 import "./CompanyTable.css";
+import { Button } from "@mui/material";
 
-const CompanyTable = ({ data, onScaledValueChange }) => {
-  console.log("Data", data);
-  const [selectedScaledValues, setSelectedScaledValues] = useState([]);
+const CompanyTable = ({ data }) => {
+  const returns = data?.returns || [];
+  const scaledValues = data?.scaledReturns || [];
 
-  const handleCheckboxChange = (value) => {
-    const updatedValues = selectedScaledValues.includes(value)
-      ? selectedScaledValues.filter((val) => val !== value)
-      : [...selectedScaledValues, value];
-    setSelectedScaledValues(updatedValues);
-    onScaledValueChange(updatedValues);
+  const [selectedValues, setSelectedValues] = React.useState([]);
+  console.log("selectedValues", selectedValues);
+
+  const addRemoveSelectedValues = (value, index) => {
+    setSelectedValues((prevSelectedValues) => {
+      const exists = prevSelectedValues.find((item) => item.index === index); //use to match index of prevstate with the index passed thru function, if index exists then return true
+
+      if (exists) {
+        return prevSelectedValues.filter((item) => item.index !== index);
+      } else {
+        return [...prevSelectedValues, { index, value }];
+      }
+    });
   };
-  console.log("selectedScaledValues", selectedScaledValues);
-
-  const dataArray = useMemo(() => [data], [data]);
-
-  const columns = useMemo(
-    () => [
-      {
-        Header: "Company Name",
-        accessor: "name",
-      },
-      {
-        Header: "Company Code",
-        accessor: "code",
-      },
-      {
-        Header: "Returns",
-        accessor: "returns",
-        Cell: ({ value }) => (
-          <ul>
-            {value.map((returnVal, index) => (
-              <li key={index}>{returnVal}</li>
-            ))}
-          </ul>
-        ),
-      },
-      {
-        Header: "Scaled Returns",
-        accessor: "scaledReturns",
-        Cell: ({ value }) => (
-          <ul>
-            {value.map((scaledReturn, index) => (
-              <li key={`${scaledReturn}-${index}`}>
-                <label>
-                  <input
-                    type="checkbox"
-                    value={scaledReturn}
-                    checked={selectedScaledValues.includes(
-                      `${scaledReturn}-${index}`
-                    )}
-                    onChange={() =>
-                      handleCheckboxChange(`${scaledReturn}-${index}`)
-                    }
-                  />
-                  {scaledReturn}
-                </label>
-              </li>
-            ))}
-          </ul>
-        ),
-      },
-    ],
-    []
-  );
-
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data: dataArray });
 
   return (
-    <div className="CalculationTable-container">
-      <table {...getTableProps()} className="CalculationTable-table">
-        <thead className="CalculationTable-thead">
-          {headerGroups.map((headerGroup) => (
-            <tr
-              {...headerGroup.getHeaderGroupProps()}
-              className="CalculationTable-headerRow"
+    <div className="CompanyTable-container">
+      <table className="CompanyTable-table">
+        <thead>
+          <tr className="CompanyTable-headerRow">
+            <th
+              colSpan={2}
+              className="CompanyTable-headerCell"
+              style={{ backgroundColor: "black", color: "white" }}
             >
-              {headerGroup.headers.map((column) => (
-                <th
-                  {...column.getHeaderProps()}
-                  className="CalculationTable-headerCell"
-                  style={{
-                    backgroundColor: "black",
+              Name: {data?.name || "N/A"}
+            </th>
+            <th
+              colSpan={2}
+              className="CompanyTable-headerCell"
+              style={{ backgroundColor: "black", color: "white" }}
+            >
+              Code: {data?.code || "N/A"}
+            </th>
+          </tr>
+          <tr className="CompanyTable-columnRow">
+            <th
+              className="CompanyTable-columnHeader"
+              style={{ backgroundColor: "black", color: "white" }}
+            >
+              Returns
+            </th>
+            <th
+              className="CompanyTable-columnHeader"
+              style={{ backgroundColor: "black", color: "white" }}
+            >
+              Scaled Values
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {returns.map((returnValue, index) => (
+            <tr key={index} className="CompanyTable-dataRow">
+              <td className="CompanyTable-dataCell">{returnValue}</td>
+              <td className="CompanyTable-dataCell">
+                {scaledValues[index]}{" "}
+                <input
+                  type="checkbox"
+                  value={scaledValues[index]}
+                  checked={selectedValues.some(
+                    (item) => item.value === scaledValues[index]
+                  )}
+                  onChange={(e) => {
+                    addRemoveSelectedValues(scaledValues[index], index);
                   }}
-                >
-                  {column.render("Header")}
-                </th>
-              ))}
+                  className="CompanyTable-checkbox"
+                />{" "}
+              </td>
             </tr>
           ))}
-        </thead>
-        <tbody {...getTableBodyProps()} className="CalculationTable-tbody">
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()} className="CalculationTable-row">
-                {row.cells.map((cell) => (
-                  <td
-                    {...cell.getCellProps()}
-                    className="CalculationTable-cell"
-                  >
-                    {cell.render("Cell")}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
         </tbody>
       </table>
+      <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
+        <Button variant="contained">Calculate all Scaled Returns</Button>
+        <Button variant="contained">Calculate selected Returns</Button>
+      </div>
     </div>
   );
 };
