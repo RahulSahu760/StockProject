@@ -68,6 +68,7 @@ const Calculations = () => {
             <CompanyTable
               data={selectedCompany}
               onScaledValueChange={handleScaledValueChange}
+              fetchCompanies={fetchCompanies}
             />
           </div>
         ) : (

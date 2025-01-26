@@ -2,12 +2,15 @@ import React from "react";
 import "./CompanyTable.css";
 import { Button } from "@mui/material";
 
-const CompanyTable = ({ data }) => {
+const baseUrl = process.env.REACT_APP_BACKEND_URL;
+const CompanyTable = ({ data, fetchCompanies }) => {
   const returns = data?.returns || [];
   const scaledValues = data?.scaledReturns || [];
 
   const [selectedValues, setSelectedValues] = React.useState([]);
   const [checkBox, setCheckBox] = React.useState(true);
+  const [currentCagr, setCurrentCagr] = React.useState(0);
+  const [currentSd, setCurrentSd] = React.useState(0);
   const [cagr, setCagr] = React.useState(0);
   const [sd, setSd] = React.useState(0);
   const [average, setAverage] = React.useState([]);
@@ -18,6 +21,12 @@ const CompanyTable = ({ data }) => {
     console.log("selectedValues", selectedValues);
   }, [selectedValues]);
 
+  React.useEffect(() => {
+    if (data) {
+      setCurrentCagr(data.cagr);
+      setCurrentSd(data.sd);
+    }
+  }, [data]);
   const calculateScaledReturns = async (scaledReturns) => {
     if (scaledReturns.length > 1) {
       //calculaing CAGR
@@ -109,20 +118,45 @@ const CompanyTable = ({ data }) => {
     setCheckBox(!checkBox);
   };
 
+  const handleSave = async () => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/api/companies/update-cagr-and-sd/${data._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cagr, sd }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("Saved");
+        fetchCompanies();
+      } else {
+        console.log("Not saved");
+      }
+      setSelectedValues([]);
+      setCagr(0);
+      setSd(0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="CompanyTable-container">
       <table className="CompanyTable-table">
         <thead>
           <tr className="CompanyTable-headerRow">
             <th
-              colSpan={2}
               className="CompanyTable-headerCell"
               style={{ backgroundColor: "black", color: "white" }}
             >
               Name: {data?.name || "N/A"}
             </th>
             <th
-              colSpan={2}
               className="CompanyTable-headerCell"
               style={{ backgroundColor: "black", color: "white" }}
             >
@@ -169,6 +203,24 @@ const CompanyTable = ({ data }) => {
               </td>
             </tr>
           ))}
+          <tr>
+            <td
+              className="CompanyTable-dataCell"
+              style={{ backgroundColor: "black", color: "white" }}
+            >
+              <span style={{ fontWeight: "bold" }}>Current CAGR:</span>{" "}
+              {currentCagr || "N/A"}
+            </td>
+            <td
+              className="CompanyTable-dataCell"
+              style={{ backgroundColor: "black", color: "white" }}
+            >
+              <span style={{ fontWeight: "bold" }}>
+                Current Standard Deviation:
+              </span>{" "}
+              {currentSd || "N/A"}
+            </td>
+          </tr>
         </tbody>
       </table>
       <div>
@@ -247,7 +299,9 @@ const CompanyTable = ({ data }) => {
         </div>
       </div>
       <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
-        <Button variant="contained">Save</Button>
+        <Button variant="contained" onClick={handleSave}>
+          Save
+        </Button>
         <Button variant="contained" onClick={handleReset}>
           Reset
         </Button>
