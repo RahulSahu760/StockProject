@@ -10,7 +10,7 @@ const addCompanies = async (req, res) => {
   }
 
   for (let company of companiesData) {
-    const { name, code, returns, scaledReturns } = company;
+    const { name, code, cagr, sd, returns, scaledReturns } = company;
 
     if (!name || !code || !returns || !scaledReturns) {
       return res.status(400).send({

@@ -10,6 +10,9 @@ const CompanyTable = ({ data }) => {
   const [checkBox, setCheckBox] = React.useState(true);
   const [cagr, setCagr] = React.useState(0);
   const [sd, setSd] = React.useState(0);
+  const [average, setAverage] = React.useState([]);
+  const [diff, setDiff] = React.useState([]);
+  const [sq, setSq] = React.useState([]);
   console.log("selectedValues", selectedValues);
   React.useEffect(() => {
     console.log("selectedValues", selectedValues);
@@ -17,32 +20,48 @@ const CompanyTable = ({ data }) => {
 
   const calculateScaledReturns = async (scaledReturns) => {
     if (scaledReturns.length > 1) {
-      // Ensure there are at least two values to calculate CAGR and SD
-      // Calculate CAGR (using the initial and final values)
-      const initialValue = scaledReturns[0]; // First value
-      const finalValue = scaledReturns[scaledReturns.length - 1]; // Last value
-      const numberOfYears = scaledReturns.length - 1; // Assuming each value represents a year
-
-      if (initialValue !== 0 && finalValue !== 0 && numberOfYears > 0) {
-        const cagr =
-          ((finalValue / initialValue) ** (1 / numberOfYears) - 1) * 100; // Multiply by 100 to convert to percentage
-
-        // Calculate Standard Deviation
-        const mean =
-          scaledReturns.reduce((acc, value) => acc + value, 0) /
-          scaledReturns.length;
-        const squaredDifferences = scaledReturns.map((value) =>
-          Math.pow(value - mean, 2)
-        );
-        const variance =
-          squaredDifferences.reduce((acc, diff) => acc + diff, 0) /
-          scaledReturns.length;
-        const standardDeviation = Math.sqrt(variance);
-
-        return { cagr, standardDeviation };
-      } else {
-        console.log("Invalid data for CAGR or Standard Deviation calculation.");
+      //calculaing CAGR
+      let multipliedValue = 1;
+      for (let i = 0; i < scaledReturns.length; i++) {
+        multipliedValue = multipliedValue * scaledReturns[i];
       }
+      const cagr = Math.pow(multipliedValue, 1 / scaledReturns.length);
+
+      //calculating Standard Deviation
+      let total = 0;
+      for (let i = 0; i < scaledReturns.length; i++) {
+        total += scaledReturns[i];
+      }
+      const avg = total / scaledReturns.length;
+      setAverage((prevAvg) => {
+        const newValues = Array(scaledReturns.length).fill(avg);
+        return [...prevAvg, ...newValues];
+      });
+      setDiff((prevDiff) => {
+        const newValues = Array.from(
+          { length: scaledReturns.length },
+          (v, index) => {
+            return avg - scaledReturns[index];
+          }
+        );
+        return [...prevDiff, ...newValues];
+      });
+      setSq((prevSq) => {
+        const newValues = scaledReturns.map((value) => {
+          return Math.pow(value - avg, 2);
+        });
+        return [...prevSq, ...newValues];
+      });
+      let total2 = 0;
+      for (let i = 0; i < scaledReturns.length; i++) {
+        total2 += Math.pow(scaledReturns[i] - avg, 2);
+      }
+      const standardDeviation = Math.pow(
+        total2 / (scaledReturns.length - 1),
+        1 / 2
+      );
+      console.log("sd", standardDeviation);
+      return { cagr, standardDeviation };
     } else {
       console.log("Not enough values to calculate CAGR or Standard Deviation.");
     }
@@ -58,6 +77,7 @@ const CompanyTable = ({ data }) => {
       updatedValues = scaledValues;
     }
 
+    setSelectedValues(updatedValues);
     const { cagr, standardDeviation } = await calculateScaledReturns(
       updatedValues
     );
@@ -151,27 +171,78 @@ const CompanyTable = ({ data }) => {
           ))}
         </tbody>
       </table>
+      <div>
+        <p>
+          <span style={{ fontStyle: "italic" }}>Note: </span>If no checkboxes
+          are selected, pressing the "Calculate Scaled Returns" button will
+          calculate the results for all records. If specific checkboxes are
+          selected, it will calculate the results only for those selected
+          values.
+        </p>
+      </div>
       <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
-        <Button variant="contained" onClick={addScaledReturns}>
-          Calculate all Scaled Returns
-        </Button>
         <Button
           variant="contained"
           onClick={() => {
             handleCheckbox();
-            calculateScaledReturns();
+            addScaledReturns();
+          }}
+          disabled={!checkBox}
+        >
+          Calculate Scaled Returns
+        </Button>
+        {/* <Button
+          variant="contained"
+          onClick={() => {
+            handleCheckbox();
+            addScaledReturns();
           }}
         >
           Calculate selected Scaled Returns
-        </Button>
+        </Button> */}
+      </div>
+      <div>
+        <table
+          border="1"
+          style={{ width: "100%", textAlign: "center", marginTop: "20px" }}
+        >
+          <thead>
+            <tr>
+              <th>Scaled Returns (SR)</th>
+              <th>Average (A)</th>
+              <th>A - SR</th>
+              <th>(A - SR)^2</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedValues.length > 0 &&
+            selectedValues.length === average.length &&
+            selectedValues.length === diff.length &&
+            selectedValues.length === sq.length
+              ? selectedValues.map((value, index) => (
+                  <tr key={index}>
+                    <td>{value || "N/A"}</td>{" "}
+                    {/* Assuming value.value holds the scaled return */}
+                    <td>{average[index] || "N/A"}</td>
+                    <td>{diff[index] || "N/A"}</td>
+                    <td>{sq[index] || "N/A"}</td>
+                  </tr>
+                ))
+              : null}
+          </tbody>
+        </table>
       </div>
       <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
-        <div>
-          <label>CAGR: </label>
+        <div style={{ borderRight: "1px solid black", paddingRight: "20px" }}>
+          <label style={{ fontWeight: "bold" }}>CAGR: </label>
           <span>{cagr}</span>
         </div>
         <div>
-          <label>SD: </label>
+          <label style={{ fontWeight: "bold" }}>
+            SD {"("}
+            <span>{"\u03C3"}</span>
+            {")"}:
+          </label>{" "}
           <span>{sd}</span>
         </div>
       </div>

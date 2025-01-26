@@ -10,6 +10,12 @@ const companySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    cagr: {
+      type: Number,
+    },
+    sd: {
+      type: Number,
+    },
     returns: {
       type: [Number],
       default: [],
