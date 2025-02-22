@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const companySchema = new mongoose.Schema(
   {
@@ -26,6 +27,34 @@ const companySchema = new mongoose.Schema(
       default: [],
       required: true,
     },
+    shareDetails: [
+      {
+        id: {
+          type: String,
+          default: uuidv4,
+        },
+        date: {
+          type: Date,
+          required: true,
+        },
+        rate: {
+          type: Number,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+        totalValue: {
+          type: Number,
+          required: true,
+        },
+        weightage: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

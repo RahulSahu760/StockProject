@@ -22,8 +22,6 @@ const Calculations = () => {
     setSelectedScaledValues(updatedValues);
   };
 
-  console.log("selectedScaledValues", selectedScaledValues);
-
   const fetchCompanies = async () => {
     try {
       const response = await axios.get(`${baseUrl}/api/companies/fetch`);
@@ -45,6 +43,9 @@ const Calculations = () => {
 
   return (
     <div className="calculations-container">
+      {alert.message && (
+        <Alert severity={alert.severity}>{alert.message}</Alert>
+      )}
       {/* Sidebar */}
       <div className="calculations-sidebar">
         <h3>Companies</h3>
@@ -68,7 +69,6 @@ const Calculations = () => {
             <CompanyTable
               data={selectedCompany}
               onScaledValueChange={handleScaledValueChange}
-              fetchCompanies={fetchCompanies}
             />
           </div>
         ) : (

@@ -3,6 +3,8 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import "./Dashboard.css";
+import bg from "./bg.jpg";
+import Weightage from "../Pages/Weightage";
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -10,6 +12,7 @@ const DashboardLayout = () => {
   const headers = {
     "/companies": "Companies",
     "/calculations": "Calculations",
+    "/weightage": "Weightage",
   };
 
   const currentHeader = headers[location.pathname] || "Dashboard";
@@ -33,6 +36,9 @@ const DashboardLayout = () => {
             >
               <Link to="/calculations">{<CalculateIcon />} Calculations</Link>
             </li>
+            <li className={location.pathname === "/weightage" ? "active" : ""}>
+              <Link to="/weightage">{""} Weightage</Link>
+            </li>
           </ul>
         </nav>
       </aside>
@@ -43,7 +49,17 @@ const DashboardLayout = () => {
           <h1>{currentHeader}</h1>
         </div>
         <div className="dashboard-content-body">
-          <Outlet /> {/* Renders child components */}
+          {location.pathname !== "/" ? (
+            <Outlet />
+          ) : (
+            <div>
+              <img
+                src={bg}
+                alt="background image"
+                style={{ objectFit: "contain", width: "100%", height: "100%" }}
+              />
+            </div>
+          )}
         </div>
       </main>
     </div>

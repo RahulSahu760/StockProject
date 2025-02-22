@@ -3,7 +3,7 @@ import "./CompanyTable.css";
 import { Button } from "@mui/material";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
-const CompanyTable = ({ data, fetchCompanies }) => {
+const CompanyTable = ({ data }) => {
   const returns = data?.returns || [];
   const scaledValues = data?.scaledReturns || [];
 
@@ -16,10 +16,6 @@ const CompanyTable = ({ data, fetchCompanies }) => {
   const [average, setAverage] = React.useState([]);
   const [diff, setDiff] = React.useState([]);
   const [sq, setSq] = React.useState([]);
-  console.log("selectedValues", selectedValues);
-  React.useEffect(() => {
-    console.log("selectedValues", selectedValues);
-  }, [selectedValues]);
 
   React.useEffect(() => {
     if (data) {
@@ -27,6 +23,7 @@ const CompanyTable = ({ data, fetchCompanies }) => {
       setCurrentSd(data.sd);
     }
   }, [data]);
+
   const calculateScaledReturns = async (scaledReturns) => {
     if (scaledReturns.length > 1) {
       //calculaing CAGR
@@ -133,10 +130,12 @@ const CompanyTable = ({ data, fetchCompanies }) => {
 
       if (response.ok) {
         console.log("Saved");
-        fetchCompanies();
+        setCurrentCagr(cagr);
+        setCurrentSd(sd);
       } else {
         console.log("Not saved");
       }
+      setCheckBox(!checkBox);
       setSelectedValues([]);
       setCagr(0);
       setSd(0);

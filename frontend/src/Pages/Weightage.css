@@ -1,0 +1,67 @@
+.weightage-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.weightage-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.weightage-stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.weightage-stock-table th,
+.weightage-stock-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.weightage-stock-table th {
+  background: #222;
+  color: white;
+  font-weight: bold;
+}
+
+.weightage-update-section {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.weightage-update-section select,
+.weightage-update-section input,
+.weightage-update-section button {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.weightage-update-section button {
+  background: #007aff;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.weightage-update-section button:hover {
+  background: #005ecb;
+}
