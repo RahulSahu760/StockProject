@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./Weightage.css";
 import axios from "axios";
+import Alert from "@mui/material/Alert";
+
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
 
 const Weightage = () => {
@@ -11,6 +13,8 @@ const Weightage = () => {
   const [newRate, setNewRate] = useState("");
   const [newQuantity, setNewQuantity] = useState("");
   const [weight, setWeight] = useState("");
+  const [triggerUpdate, setTriggerUpdate] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const [date, setDate] = useState("");
 
   const fetchCompanies = async () => {
@@ -22,28 +26,27 @@ const Weightage = () => {
         setCompanies([]);
       }
     } catch (error) {
+      setCompanies([]);
       setAlert({ message: error.message, severity: "error" });
     }
   };
 
   useEffect(() => {
     fetchCompanies();
-  }, []);
+  }, [refresh]);
 
   console.log("companies", companies);
 
   const calculateWeightage = (updatedCompanies) => {
-    //extract totalValue form each company, add them and divide by totalValue of specific company
     const totalInvest = updatedCompanies.reduce(
-      (sum, company) => sum + (company.shareDetails[0]?.totalValue || 0),
+      (sum, company) =>
+        sum +
+        company.shareDetails.reduce((subSum, s) => subSum + s.totalValue, 0),
       0
     );
 
-    if (totalInvest === 0)
-      return updatedCompanies.map((c) => ({
-        ...c,
-        shareDetails: c.shareDetails.map((s) => ({ ...s, weightage: 0 })),
-      }));
+    if (updatedCompanies.length === 0 || totalInvest === 0)
+      return updatedCompanies;
 
     return updatedCompanies.map((company) => ({
       ...company,
@@ -54,20 +57,23 @@ const Weightage = () => {
     }));
   };
 
-  const handleUpdate = () => {
-    if (!selectedCompany || !newRate || !newQuantity) return;
+  const handleUpdate = async () => {
+    if (!selectedCompany || newRate === "" || newQuantity === "" || !date)
+      return;
 
     const updatedCompanies = companies.map((company) =>
       company._id === selectedCompany
         ? {
             ...company,
-            shareDetails: company.shareDetails.map((share) => ({
-              ...share,
-              date: date,
-              rate: Number(newRate),
-              quantity: Number(newQuantity),
-              totalValue: Number(newRate) * Number(newQuantity),
-            })),
+            shareDetails: [
+              ...company.shareDetails,
+              {
+                date: date,
+                rate: Number(newRate),
+                quantity: Number(newQuantity),
+                totalValue: Number(newRate) * Number(newQuantity),
+              },
+            ],
           }
         : company
     );
@@ -75,10 +81,50 @@ const Weightage = () => {
     const finalCompanies = calculateWeightage(updatedCompanies);
     setUCompanies(finalCompanies);
     console.log("finalCompanies", finalCompanies);
+
+    setTriggerUpdate(true);
+
     setNewRate("");
     setNewQuantity("");
     setDate("");
   };
+
+  useEffect(() => {
+    if (!triggerUpdate) return;
+
+    const updateWeightage = async () => {
+      try {
+        const response = await fetch(
+          `${baseUrl}/api/companies/update-weightage`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(uCompanies),
+          }
+        );
+
+        if (response.ok) {
+          console.log("updated");
+          setAlert({
+            message: "Weightage updated successfully",
+            severity: "success",
+          });
+          setRefresh((prev) => !prev);
+        } else {
+          console.log("not updated");
+          setAlert({ message: "Error updating weightage", severity: "error" });
+        }
+      } catch (error) {
+        setAlert({ message: error.message, severity: "error" });
+      } finally {
+        setTriggerUpdate(false); // Reset trigger
+      }
+    };
+
+    updateWeightage();
+  }, [triggerUpdate, uCompanies]);
 
   return (
     <div className="weightage-container">
@@ -95,16 +141,33 @@ const Weightage = () => {
           </tr>
         </thead>
         <tbody>
-          {companies.map((company, index) => (
-            <tr key={index}>
-              <td>{company.name}</td>
-              <td>{company.shareDetails[0]?.rate || "N/A"}</td>
-              <td>{company.shareDetails[0]?.quantity || "N/A"}</td>
-              <td>{company.shareDetails[0]?.totalValue || "N/A"}</td>
-              <td>{company.shareDetails[0]?.date || "N/A"}</td>
-              <td>{company.shareDetails[0]?.weightage || "N/A"}</td>
-            </tr>
-          ))}
+          {companies.map((company, index) => {
+            return (
+              <tr key={index}>
+                <td>{company.name}</td>
+                <td>
+                  {company.shareDetails[company.shareDetails.length - 1]
+                    ?.rate || "N/A"}
+                </td>
+                <td>
+                  {company.shareDetails[company.shareDetails.length - 1]
+                    ?.quantity || "N/A"}
+                </td>
+                <td>
+                  {company.shareDetails[company.shareDetails.length - 1]
+                    ?.totalValue || "N/A"}
+                </td>
+                <td>
+                  {company.shareDetails[company.shareDetails.length - 1]
+                    ?.date || "N/A"}
+                </td>
+                <td>
+                  {company.shareDetails[company.shareDetails.length - 1]
+                    ?.weightage || "N/A"}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       <div className="weightage-update-section">
@@ -139,6 +202,9 @@ const Weightage = () => {
         />
         <button onClick={handleUpdate}>Update</button>
       </div>
+      {alert.message && (
+        <Alert severity={alert.severity}>{alert.message}</Alert>
+      )}
     </div>
   );
 };
