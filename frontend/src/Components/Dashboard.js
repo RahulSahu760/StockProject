@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import "./Dashboard.css";
+import ScaleIcon from "@mui/icons-material/Scale";
 import bg from "./bg.jpg";
 import Weightage from "../Pages/Weightage";
 
@@ -37,7 +38,7 @@ const DashboardLayout = () => {
               <Link to="/calculations">{<CalculateIcon />} Calculations</Link>
             </li>
             <li className={location.pathname === "/weightage" ? "active" : ""}>
-              <Link to="/weightage">{""} Weightage</Link>
+              <Link to="/weightage">{<ScaleIcon />} Weightage</Link>
             </li>
           </ul>
         </nav>

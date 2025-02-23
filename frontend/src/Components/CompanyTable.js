@@ -29,9 +29,12 @@ const CompanyTable = ({ data }) => {
       //calculaing CAGR
       let multipliedValue = 1;
       for (let i = 0; i < scaledReturns.length; i++) {
+        console.log(scaledReturns[i], "*", multipliedValue);
         multipliedValue = multipliedValue * scaledReturns[i];
+        console.log("multipliedValue", multipliedValue);
       }
       const cagr = Math.pow(multipliedValue, 1 / scaledReturns.length);
+      console.log("cagr", cagr);
 
       //calculating Standard Deviation
       let total = 0;
