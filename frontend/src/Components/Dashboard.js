@@ -4,6 +4,7 @@ import CalculateIcon from "@mui/icons-material/Calculate";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import "./Dashboard.css";
 import ScaleIcon from "@mui/icons-material/Scale";
+import FunctionsIcon from "@mui/icons-material/Functions";
 import bg from "./bg.jpg";
 import Weightage from "../Pages/Weightage";
 
@@ -14,6 +15,7 @@ const DashboardLayout = () => {
     "/companies": "Companies",
     "/calculations": "Calculations",
     "/weightage": "Weightage",
+    "/portfolio-sd": "Portfolio SD",
   };
 
   const currentHeader = headers[location.pathname] || "Dashboard";
@@ -39,6 +41,11 @@ const DashboardLayout = () => {
             </li>
             <li className={location.pathname === "/weightage" ? "active" : ""}>
               <Link to="/weightage">{<ScaleIcon />} Weightage</Link>
+            </li>
+            <li
+              className={location.pathname === "/Portfolio SD" ? "active" : ""}
+            >
+              <Link to="/portfolio-sd">{<FunctionsIcon />} Portfolio SD</Link>
             </li>
           </ul>
         </nav>

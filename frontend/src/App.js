@@ -4,6 +4,7 @@ import Companies from "./Pages/Companies";
 import DashboardLayout from "./Components/Dashboard";
 import Calculations from "./Pages/calculations";
 import Weightage from "./Pages/Weightage";
+import PortfolioSD from "./Pages/PortfolioSD";
 function App() {
   return (
     <div className="App">
@@ -12,6 +13,7 @@ function App() {
           <Route path="/companies" element={<Companies />} />
           <Route path="/calculations" element={<Calculations />} />
           <Route path="/weightage" element={<Weightage />} />
+          <Route path="/portfolio-sd" element={<PortfolioSD />} />
         </Route>
       </Routes>
     </div>
