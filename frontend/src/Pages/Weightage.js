@@ -44,12 +44,18 @@ const Weightage = () => {
   console.log("companies", companies);
 
   const calculateWeightage = (updatedCompanies) => {
-    const totalInvest = updatedCompanies.reduce(
-      (sum, company) =>
-        sum +
-        company.shareDetails.reduce((subSum, s) => subSum + s.totalValue, 0),
-      0
-    );
+    // const totalInvest = updatedCompanies.reduce(
+    //   (sum, company) =>
+    //     sum +
+    //     company.shareDetails.reduce((subSum, s) => subSum + s.totalValue, 0),
+    //   0
+    // );
+    var totalCalc = 0;
+    const totalInvest = updatedCompanies.map((company) => {
+      totalCalc +=
+        company.shareDetails[company.shareDetails.length - 1].totalValue;
+      return totalCalc;
+    });
 
     if (updatedCompanies.length === 0 || totalInvest === 0)
       return updatedCompanies;
@@ -58,7 +64,8 @@ const Weightage = () => {
       ...company,
       shareDetails: company.shareDetails.map((share) => ({
         ...share,
-        weightage: (share.totalValue / totalInvest) * 100,
+        weightage:
+          (share.totalValue / totalInvest[totalInvest.length - 1]) * 100,
       })),
     }));
   };
