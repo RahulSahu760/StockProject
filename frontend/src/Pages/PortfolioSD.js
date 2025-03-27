@@ -10,6 +10,7 @@ const PortfolioSD = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [psd, setPSD] = useState(0);
   const [error, setError] = useState("");
+  const [correlations, setCorrelations] = useState({});
 
   useEffect(() => {
     fetchData();
@@ -63,25 +64,58 @@ const PortfolioSD = () => {
     setError("");
 
     let calc1 = 0;
-    let calc2 = 1;
-    let calc3 = 1;
+    let calc3 = 0;
+    let correlationResults = {};
 
     try {
-      data.forEach((company, index) => {
-        if (company.shareDetails && company.shareDetails.length > 0) {
-          calc1 += Math.pow(company.sd, 2 * company.shareDetails[0].weightage);
-          calc2 *= company.sd * company.shareDetails[0].weightage;
+      // Step 1: Calculate variance terms
+      data.forEach((company) => {
+        const lastShare =
+          company.shareDetails?.[company.shareDetails.length - 1];
 
-          if (index < data.length - 1) {
-            const correlation = calculateCorrelation(
-              company.scaledReturns,
-              data[index + 1].scaledReturns
-            );
-            calc3 *= correlation;
-          }
+        if (lastShare?.weightage && company.sd) {
+          calc1 += Math.pow(company.sd, 2) * Math.pow(lastShare.weightage, 2);
         }
       });
-      setPSD(Math.sqrt(calc1 + calc2 + calc3));
+
+      // Step 2: Calculate correlation for unique pairs
+      for (let i = 0; i < data.length; i++) {
+        for (let j = i + 1; j < data.length; j++) {
+          const shareDetails1 =
+            data[i].shareDetails?.[data[i].shareDetails.length - 1];
+          const shareDetails2 =
+            data[j].shareDetails?.[data[j].shareDetails.length - 1];
+
+          if (
+            shareDetails1?.weightage &&
+            data[i].sd &&
+            shareDetails2?.weightage &&
+            data[j].sd
+          ) {
+            const key = `Relation (${data[i].name}-${data[j].name})`;
+
+            // Compute correlation once and store it
+            const correlationValue = calculateCorrelation(
+              data[i].scaledReturns,
+              data[j].scaledReturns
+            );
+
+            const correlation =
+              correlationValue *
+              shareDetails1.weightage *
+              shareDetails2.weightage *
+              data[i].sd *
+              data[j].sd *
+              2;
+
+            calc3 += correlation;
+            correlationResults[key] = correlationValue; // Store correlation value
+          }
+        }
+      }
+
+      setCorrelations(correlationResults);
+      setPSD(Math.sqrt(calc1 + calc3));
     } catch (err) {
       setError("Error occurred during PSD calculation.");
     }
@@ -128,9 +162,20 @@ const PortfolioSD = () => {
         </div>
       </Card>
       {selectedOption === "Calculate Portfolio SD" && (
-        <h2 className="text-xl font-semibold text-gray-800 mt-4 text-center">
-          Portfolio SD: {psd}
-        </h2>
+        <div>
+          <div>
+            <div>
+              {Object.entries(correlations).map(([key, value]) => (
+                <p key={key}>
+                  {key} = {value.toFixed(4)}
+                </p>
+              ))}
+            </div>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mt-4 text-center">
+            Portfolio SD: {psd}
+          </h2>
+        </div>
       )}
       {selectedOption === "Calculate Selected Portfolio SD" && <div>SPDSD</div>}
     </div>

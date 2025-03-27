@@ -159,6 +159,7 @@ const CompanyTable = () => {
       );
       setShowAlert(true);
       setAlert({ message: "Data saved successfully", severity: "success" });
+      setFields([{ name: "", code: "", returns: [], scaledReturns: [] }]);
       await fetchAllCompanies();
     } catch (error) {
       setShowAlert(true);
