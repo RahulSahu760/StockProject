@@ -127,9 +127,27 @@ const updateWeightage = async (req, res) => {
   }
 };
 
+const addReturnValues = async (req, res) => {
+  const { code } = req.params;
+  const { returns, scaledReturns } = req.body;
+
+  try {
+    const company = await Company.findOne({ code });
+    if (!company) {
+      return res.status(404).send({ message: "Company not found" });
+    }
+    company.returns.push(...returns);
+    company.scaledReturns.push(...scaledReturns);
+    await company.save();
+    res.status(200).json({ message: "Return values added successfully" });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+};
 module.exports = {
   addCompanies,
   getCompanies,
   updateCagrAndSd,
   updateWeightage,
+  addReturnValues,
 };

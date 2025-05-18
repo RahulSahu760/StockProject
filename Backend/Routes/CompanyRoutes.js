@@ -5,6 +5,7 @@ const {
   getCompanies,
   updateCagrAndSd,
   updateWeightage,
+  addReturnValues,
 } = require("../Controllers/CompanyController.js");
 
 // add companies
@@ -15,6 +16,8 @@ router.get("/fetch", getCompanies);
 router.patch("/update-cagr-and-sd/:id", updateCagrAndSd);
 // update weightage
 router.patch("/update-weightage", updateWeightage);
+/// add return values of exisiting companies
+router.post("/add-return-values/:code", addReturnValues);
 // fetch company by id
 // update company by id
 // delete company by id

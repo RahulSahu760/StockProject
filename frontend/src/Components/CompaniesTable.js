@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import "./CompaniesTable.css";
+import { v4 as uuidv4 } from "uuid";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -59,7 +60,12 @@ const CompanyTable = () => {
   const [error, setError] = useState(null);
   const [alert, setAlert] = useState({ message: "", severity: "" }); //
   const [showAlert, setShowAlert] = useState(false);
-
+  const [addReturnCompany, setAddReturnCompany] = useState("");
+  const [addReturnValues, setAddReturnValues] = useState([]);
+  const [scaledValues, setScaledValues] = useState([]);
+  const [aRV, setARV] = useState([{ index: 0, value: 0 }]);
+  const [aSV, setASV] = useState([{ index: 0, value: 0 }]);
+  const [save, setSave] = useState(false);
   const addField = () => {
     setFields([
       ...fields,
@@ -117,6 +123,16 @@ const CompanyTable = () => {
 
   const validateFields = () => {
     for (const field of fields) {
+      for (const company of companies) {
+        if (field.name === company.name || field.code === company.code) {
+          setShowAlert(true);
+          setAlert({
+            message: `${field.name} is already present`,
+            severity: "error",
+          });
+          return false;
+        }
+      }
       if (!field.name || !field.code) {
         setShowAlert(true);
         setAlert({ message: "Name and Code are required!", severity: "error" });
@@ -184,10 +200,78 @@ const CompanyTable = () => {
   }, []);
   console.log("Companies: ", companies);
   console.log("Fields: ", fields);
+  console.log("Add Return Company: ", addReturnCompany);
+  console.log("Add Return Values: ", addReturnValues);
+  console.log("Scaled Values: ", scaledValues);
 
   const maxReturnsLength = Math.max(
     ...companies.map((company) => company.returns.length)
   ); // stores length of each company's returns
+
+  const handleReturnCompanyChange = (value) => {
+    if (!value || value === "") return;
+    setAddReturnCompany(value);
+    setAddReturnValues(
+      companies.find((company) => company.code === value).returns
+    );
+    setScaledValues(
+      companies.find((company) => company.code === value).scaledReturns
+    );
+  };
+
+  const addNewField = () => {
+    const anfid = uuidv4();
+    setARV([...aRV, { index: anfid, value: 0 }]);
+    setASV([...aSV, { index: anfid, value: 0 }]);
+  };
+
+  const handleaRVChange = (index, value) => {
+    setARV(
+      aRV.map((item) => (item.index === index ? { ...item, value } : item))
+    );
+    const scaledValue = calculateScaledReturn(value);
+    setASV(
+      aSV.map((item) =>
+        item.index === index ? { ...item, value: scaledValue } : item
+      )
+    );
+  };
+  console.log("ARV: ", aRV);
+  console.log("ASV: ", aSV);
+
+  const handleRemoveField = (index) => {
+    if (!index) return;
+    setARV(aRV.filter((item) => item.index !== index));
+    setASV(aSV.filter((item) => item.index !== index));
+  };
+
+  const handleSaveaRV = async () => {
+    if (!addReturnCompany) return;
+    const saveReturn = aRV.map((item) => Number(item.value));
+    const saveScaledReturn = aSV.map((item) => Number(item.value));
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/api/companies/add-return-values/${addReturnCompany}`,
+        {
+          returns: saveReturn,
+          scaledReturns: saveScaledReturn,
+        }
+      );
+      if (response.status === 200) {
+        setShowAlert(true);
+        setAlert({
+          message: "Data saved successfully",
+          severity: "success",
+        });
+      }
+
+      await fetchAllCompanies();
+    } catch {
+      setShowAlert(true);
+      setAlert({ message: error.response.data, severity: "error" });
+    }
+  };
 
   return (
     <div className="container">
@@ -346,6 +430,67 @@ const CompanyTable = () => {
         <Button className="confirm-btn" onClick={saveData}>
           Confirm
         </Button>
+      </div>
+      <div className="accordion-section">
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ArrowDownwardIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography component="span">
+              Add Return Values To Existing Companies
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <select
+              value={addReturnCompany}
+              placeholder="Select a company"
+              onChange={(e) => handleReturnCompanyChange(e.target.value)}
+            >
+              <option value="">Select a company</option>
+              {companies.map((company, index) => (
+                <option key={index} value={company.code}>
+                  {company.name}
+                </option>
+              ))}
+            </select>
+            <table>
+              <tr>
+                <th>Return Values for {addReturnCompany}</th>
+              </tr>
+              {addReturnValues?.map((value, index) => (
+                <tr key={index}>
+                  <td>{value}</td>
+                </tr>
+              ))}
+            </table>
+            {addReturnCompany && (
+              <div>
+                <div>
+                  <Button onClick={addNewField}>Add Return Values</Button>
+                </div>
+
+                {aRV?.map((field, index) => (
+                  <div key={field.index}>
+                    <input
+                      type="number"
+                      value={field.value}
+                      onChange={(e) =>
+                        handleaRVChange(field.index, e.target.value)
+                      }
+                    />
+                    <Button onClick={() => handleRemoveField(field.index)}>
+                      Remove Field
+                    </Button>
+                  </div>
+                ))}
+
+                <Button onClick={handleSaveaRV}>Save</Button>
+              </div>
+            )}
+          </AccordionDetails>
+        </Accordion>
       </div>
     </div>
   );
