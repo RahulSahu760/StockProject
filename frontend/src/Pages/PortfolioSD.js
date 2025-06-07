@@ -34,7 +34,9 @@ const PortfolioSD = () => {
 
   function calculateCorrelation(x, y) {
     if (!x || !y || x.length !== y.length || x.length === 0) {
-      setError("Invalid data for correlation calculation.");
+      setError(
+        "Invalid data for correlation calculation. All the companies do not have the same number of return periods"
+      );
       return 0;
     }
     const n = x.length;
@@ -122,17 +124,57 @@ const PortfolioSD = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-6">
+    <div
+      className="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-6"
+      style={{
+        width: "100%",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#F3F4F6",
+        padding: "1.5rem",
+      }}
+    >
       {error && (
-        <Alert severity="error" className="mb-4">
+        <Alert
+          severity="error"
+          className="mb-4"
+          style={{ marginBottom: "1rem" }}
+        >
           {error}
         </Alert>
       )}
-      <Card className="p-6 w-full max-w-md bg-white shadow-lg rounded-2xl">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+
+      <Card
+        className="p-6 w-full max-w-md bg-white shadow-lg rounded-2xl"
+        style={{
+          padding: "1.5rem",
+          width: "100%",
+          maxWidth: "400px",
+          backgroundColor: "#FFFFFF",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+          borderRadius: "1rem",
+        }}
+      >
+        <h2
+          className="text-xl font-semibold text-gray-800 mb-4 text-center"
+          style={{
+            fontSize: "1.25rem",
+            fontWeight: "600",
+            color: "#1F2937",
+            marginBottom: "1rem",
+            textAlign: "center",
+          }}
+        >
           Select an Option
         </h2>
-        <div className="flex flex-col space-y-4">
+
+        <div
+          className="flex flex-col space-y-4"
+          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+        >
           {["Calculate Portfolio SD", "Calculate Selected Portfolio SD"].map(
             (option, index) => (
               <motion.button
@@ -144,6 +186,13 @@ const PortfolioSD = () => {
                   calculatePSD();
                 }}
                 style={{
+                  width: "100%",
+                  padding: "0.75rem 1rem",
+                  borderRadius: "0.5rem",
+                  borderWidth: "1px",
+                  fontWeight: "500",
+                  fontSize: "1rem",
+                  transition: "all 0.3s ease",
                   backgroundColor:
                     selectedOption === option ? "#2563EB" : "#F3F4F6",
                   color: selectedOption === option ? "#FFFFFF" : "#1F2937",
@@ -153,6 +202,7 @@ const PortfolioSD = () => {
                     selectedOption === option
                       ? "0px 4px 6px rgba(0, 0, 0, 0.1)"
                       : "none",
+                  cursor: "pointer",
                 }}
               >
                 {option}
@@ -161,23 +211,113 @@ const PortfolioSD = () => {
           )}
         </div>
       </Card>
+
       {selectedOption === "Calculate Portfolio SD" && (
-        <div>
-          <div>
-            <div>
-              {Object.entries(correlations).map(([key, value]) => (
-                <p key={key}>
-                  {key} = {value.toFixed(4)}
-                </p>
+        <div
+          style={{
+            marginTop: "2rem",
+            width: "100%",
+            maxWidth: "600px",
+            backgroundColor: "#FFFFFF",
+            padding: "1.5rem",
+            borderRadius: "1rem",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "1.1rem",
+              fontWeight: "600",
+              color: "#1F2937",
+              marginBottom: "1rem",
+              textAlign: "center",
+            }}
+          >
+            Correlation Matrix
+          </h3>
+          <table
+            className="min-w-full text-sm text-left"
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <thead>
+              <tr style={{ backgroundColor: "#E5E7EB" }}>
+                <th
+                  style={{
+                    padding: "0.75rem 1rem",
+                    fontWeight: "600",
+                    color: "#374151",
+                    borderBottom: "1px solid #D1D5DB",
+                  }}
+                >
+                  Pair
+                </th>
+                <th
+                  style={{
+                    padding: "0.75rem 1rem",
+                    fontWeight: "600",
+                    color: "#374151",
+                    borderBottom: "1px solid #D1D5DB",
+                  }}
+                >
+                  Correlation
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(correlations).map(([key, value], idx) => (
+                <tr
+                  key={key}
+                  style={{
+                    backgroundColor: idx % 2 === 0 ? "#FFFFFF" : "#F9FAFB",
+                  }}
+                >
+                  <td style={{ padding: "0.75rem 1rem", color: "#1F2937" }}>
+                    {key}
+                  </td>
+                  <td style={{ padding: "0.75rem 1rem", color: "#1F2937" }}>
+                    {value.toFixed(4)}
+                  </td>
+                </tr>
               ))}
-            </div>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-800 mt-4 text-center">
+            </tbody>
+          </table>
+          <h2
+            className="text-xl font-semibold text-gray-800 mt-4 text-center"
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: "600",
+              color: "#1F2937",
+              textAlign: "center",
+            }}
+          >
             Portfolio SD: {psd}
           </h2>
         </div>
       )}
-      {selectedOption === "Calculate Selected Portfolio SD" && <div>SPDSD</div>}
+
+      {selectedOption === "Calculate Selected Portfolio SD" && (
+        <div
+          style={{
+            marginTop: "2rem",
+            width: "100%",
+            maxWidth: "400px",
+            padding: "1.5rem",
+            backgroundColor: "#F87171", // light red
+            color: "#FFFFFF",
+            borderRadius: "0.75rem",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            textAlign: "center",
+            fontWeight: "500",
+            fontSize: "1rem",
+          }}
+        >
+          🚫 Page Not Available
+        </div>
+      )}
     </div>
   );
 };

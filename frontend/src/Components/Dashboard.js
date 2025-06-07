@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
@@ -7,9 +7,37 @@ import ScaleIcon from "@mui/icons-material/Scale";
 import FunctionsIcon from "@mui/icons-material/Functions";
 import bg from "./bg.jpg";
 import Weightage from "../Pages/Weightage";
+import CompanyGraphPage from "./CompanyGraphPage";
+import axios from "axios";
 
 const DashboardLayout = () => {
+  const baseUrl = process.env.REACT_APP_BACKEND_URL;
+
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [companies, setCompanies] = useState([]);
+
+  const fetchAllCompanies = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/api/companies/fetch`);
+      if (response.data) {
+        setCompanies(response.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchAllCompanies();
+  }, []);
+  useEffect(() => {
+    if (location.pathname === "/") {
+      fetchAllCompanies();
+    }
+  }, [location.pathname]);
 
   const headers = {
     "/companies": "Companies",
@@ -24,7 +52,9 @@ const DashboardLayout = () => {
       {/* Sidebar */}
       <aside className="dashboard-sidebar">
         <div className="dashboard-sidebar-header">
-          <h2>Stock Analysis</h2>
+          <Link to="/">
+            <h2>Stock Analysis</h2>
+          </Link>
         </div>
         <nav className="dashboard-nav-menu">
           <ul>
@@ -61,11 +91,15 @@ const DashboardLayout = () => {
             <Outlet />
           ) : (
             <div>
-              <img
-                src={bg}
-                alt="background image"
-                style={{ objectFit: "contain", width: "100%", height: "100%" }}
-              />
+              {loading ? (
+                <p>Loading companies...</p>
+              ) : error ? (
+                <p style={{ color: "red" }}>Error: {error}</p>
+              ) : companies.length > 0 ? (
+                <CompanyGraphPage companies={companies} />
+              ) : (
+                <p>No companies found.</p>
+              )}
             </div>
           )}
         </div>

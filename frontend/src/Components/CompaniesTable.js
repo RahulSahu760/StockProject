@@ -61,6 +61,10 @@ const CompanyTable = () => {
   const [alert, setAlert] = useState({ message: "", severity: "" }); //
   const [showAlert, setShowAlert] = useState(false);
   const [addReturnCompany, setAddReturnCompany] = useState("");
+  const [editReturnCompany, setEditReturnCompany] = useState("");
+  const [selectedCompanyReturns, setSelectedCompanyReturns] = useState([]);
+  const [selectedCompanyScaledReturns, setSelectedCompanyScaledReturns] =
+    useState([]);
   const [addReturnValues, setAddReturnValues] = useState([]);
   const [scaledValues, setScaledValues] = useState([]);
   const [aRV, setARV] = useState([{ index: 0, value: 0 }]);
@@ -269,10 +273,54 @@ const CompanyTable = () => {
       await fetchAllCompanies();
     } catch {
       setShowAlert(true);
-      setAlert({ message: error.response.data, severity: "error" });
+      const message =
+        error?.response?.data?.message ||
+        error.message ||
+        "Something went wrong";
+
+      setAlert({ message, severity: "error" });
     }
   };
 
+  const handleEditSelectedCompany = (value) => {
+    setEditReturnCompany(value);
+    setSelectedCompanyReturns(
+      companies.find((company) => company.code === value).returns
+    );
+    setSelectedCompanyScaledReturns(
+      companies.find((company) => company.code === value).scaledReturns
+    );
+  };
+
+  const handleSaveEditReturnValues = async () => {
+    console.log("newreturnValues", selectedCompanyReturns);
+    console.log("newscaledValues", selectedCompanyScaledReturns);
+    console.log("CompanyCode", editReturnCompany);
+    if (!editReturnCompany) return;
+    try {
+      const response = await axios.patch(
+        `${baseUrl}/api/companies/update-return-values/${editReturnCompany}`,
+        {
+          returns: selectedCompanyReturns,
+          scaledReturns: selectedCompanyScaledReturns,
+        }
+      );
+      if (response.status === 200) {
+        setShowAlert(true);
+        setAlert({
+          message: "Data saved successfully",
+          severity: "success",
+        });
+      }
+      await fetchAllCompanies();
+      setEditReturnCompany(null);
+      setSelectedCompanyReturns([]);
+      setSelectedCompanyScaledReturns([]);
+    } catch {
+      setShowAlert(true);
+      setAlert({ message: error.response.data, severity: "error" });
+    }
+  };
   return (
     <div className="container">
       {alert.message && showAlert && (
@@ -554,6 +602,115 @@ const CompanyTable = () => {
 
                 <Button
                   onClick={handleSaveaRV}
+                  style={{
+                    padding: "8px 16px",
+                    fontSize: "14px",
+                    alignSelf: "flex-start",
+                    backgroundColor: "#1976d2",
+                    color: "#fff",
+                    borderRadius: "4px",
+                    marginTop: "8px",
+                  }}
+                >
+                  Save
+                </Button>
+              </div>
+            )}
+          </AccordionDetails>
+        </Accordion>
+      </div>
+      <div className="accordion-section" style={{ marginTop: "20px" }}>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ArrowDownwardIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography component="span">Edit Return Values</Typography>
+          </AccordionSummary>
+          <AccordionDetails
+            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          >
+            <select
+              value={editReturnCompany}
+              placeholder="Select a company"
+              onChange={(e) => handleEditSelectedCompany(e.target.value)}
+              style={{
+                padding: "8px",
+                fontSize: "16px",
+                maxWidth: "300px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
+            >
+              <option value="">Select a company</option>
+              {companies.map((company, index) => (
+                <option key={index} value={company.code}>
+                  {company.name}
+                </option>
+              ))}
+            </select>
+
+            <table
+              style={{
+                borderCollapse: "collapse",
+                width: "100%",
+                maxWidth: "600px",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "8px",
+                      backgroundColor: "#f0f0f0",
+                      borderBottom: "1px solid #ccc",
+                    }}
+                  >
+                    Return Values for {editReturnCompany}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedCompanyReturns?.map((value, index) => (
+                  <tr key={index}>
+                    <td
+                      style={{ padding: "8px", borderBottom: "1px solid #eee" }}
+                    >
+                      <input
+                        type="number"
+                        value={value}
+                        onChange={(e) => {
+                          const updatedValues = [...selectedCompanyReturns];
+                          updatedValues[index] = e.target.value;
+                          setSelectedCompanyReturns(updatedValues);
+                          const scaledValue = calculateScaledReturn(
+                            e.target.value
+                          );
+                          const updatedScaledValues = [
+                            ...selectedCompanyScaledReturns,
+                          ];
+                          updatedScaledValues[index] = scaledValue;
+                          setSelectedCompanyScaledReturns(updatedScaledValues);
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {selectedCompanyReturns && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
+              >
+                <Button
+                  onClick={handleSaveEditReturnValues}
                   style={{
                     padding: "8px 16px",
                     fontSize: "14px",
