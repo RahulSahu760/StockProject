@@ -431,7 +431,7 @@ const CompanyTable = () => {
           Confirm
         </Button>
       </div>
-      <div className="accordion-section">
+      <div className="accordion-section" style={{ marginTop: "20px" }}>
         <Accordion>
           <AccordionSummary
             expandIcon={<ArrowDownwardIcon />}
@@ -442,11 +442,20 @@ const CompanyTable = () => {
               Add Return Values To Existing Companies
             </Typography>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails
+            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          >
             <select
               value={addReturnCompany}
               placeholder="Select a company"
               onChange={(e) => handleReturnCompanyChange(e.target.value)}
+              style={{
+                padding: "8px",
+                fontSize: "16px",
+                maxWidth: "300px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
             >
               <option value="">Select a company</option>
               {companies.map((company, index) => (
@@ -455,38 +464,108 @@ const CompanyTable = () => {
                 </option>
               ))}
             </select>
-            <table>
-              <tr>
-                <th>Return Values for {addReturnCompany}</th>
-              </tr>
-              {addReturnValues?.map((value, index) => (
-                <tr key={index}>
-                  <td>{value}</td>
+
+            <table
+              style={{
+                borderCollapse: "collapse",
+                width: "100%",
+                maxWidth: "600px",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "8px",
+                      backgroundColor: "#f0f0f0",
+                      borderBottom: "1px solid #ccc",
+                    }}
+                  >
+                    Return Values for {addReturnCompany}
+                  </th>
                 </tr>
-              ))}
+              </thead>
+              <tbody>
+                {addReturnValues?.map((value, index) => (
+                  <tr key={index}>
+                    <td
+                      style={{ padding: "8px", borderBottom: "1px solid #eee" }}
+                    >
+                      {value}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
+
             {addReturnCompany && (
-              <div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
+              >
                 <div>
-                  <Button onClick={addNewField}>Add Return Values</Button>
+                  <Button
+                    onClick={addNewField}
+                    style={{
+                      padding: "6px 12px",
+                      fontSize: "14px",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Add Return Values
+                  </Button>
                 </div>
 
                 {aRV?.map((field, index) => (
-                  <div key={field.index}>
+                  <div
+                    key={field.index}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
                     <input
                       type="number"
                       value={field.value}
                       onChange={(e) =>
                         handleaRVChange(field.index, e.target.value)
                       }
+                      style={{
+                        padding: "6px 8px",
+                        fontSize: "14px",
+                        width: "120px",
+                        borderRadius: "4px",
+                        border: "1px solid #ccc",
+                      }}
                     />
-                    <Button onClick={() => handleRemoveField(field.index)}>
+                    <Button
+                      onClick={() => handleRemoveField(field.index)}
+                      style={{ padding: "6px 12px", fontSize: "14px" }}
+                    >
                       Remove Field
                     </Button>
                   </div>
                 ))}
 
-                <Button onClick={handleSaveaRV}>Save</Button>
+                <Button
+                  onClick={handleSaveaRV}
+                  style={{
+                    padding: "8px 16px",
+                    fontSize: "14px",
+                    alignSelf: "flex-start",
+                    backgroundColor: "#1976d2",
+                    color: "#fff",
+                    borderRadius: "4px",
+                    marginTop: "8px",
+                  }}
+                >
+                  Save
+                </Button>
               </div>
             )}
           </AccordionDetails>

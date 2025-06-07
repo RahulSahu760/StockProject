@@ -22,6 +22,13 @@ const CompanyTable = ({ data }) => {
       setCurrentCagr(data.cagr);
       setCurrentSd(data.sd);
     }
+    setCagr(0);
+    setSd(0);
+    setAverage([]);
+    setDiff([]);
+    setSq([]);
+    setSelectedValues([]);
+    setCheckBox(true);
   }, [data]);
 
   const calculateScaledReturns = async (scaledReturns) => {
