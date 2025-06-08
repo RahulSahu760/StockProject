@@ -5,8 +5,8 @@ import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import "./Dashboard.css";
 import ScaleIcon from "@mui/icons-material/Scale";
 import FunctionsIcon from "@mui/icons-material/Functions";
-import bg from "./bg.jpg";
-import Weightage from "../Pages/Weightage";
+// import bg from "./bg.jpg";
+// import Weightage from "../Pages/Weightage";
 import CompanyGraphPage from "./CompanyGraphPage";
 import axios from "axios";
 
@@ -32,7 +32,7 @@ const DashboardLayout = () => {
   };
   useEffect(() => {
     fetchAllCompanies();
-  }, []);
+  }, [fetchAllCompanies]);
   useEffect(() => {
     if (location.pathname === "/") {
       fetchAllCompanies();

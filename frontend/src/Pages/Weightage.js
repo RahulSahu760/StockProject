@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid } from "@mui/x-data-grid";
 import "./Weightage.css";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
@@ -15,7 +14,7 @@ const Weightage = () => {
   const [selectedCompany, setSelectedCompany] = useState("");
   const [newRate, setNewRate] = useState("");
   const [newQuantity, setNewQuantity] = useState("");
-  const [weight, setWeight] = useState("");
+  // const [weight, setWeight] = useState("");
   const [triggerUpdate, setTriggerUpdate] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [date, setDate] = useState("");
