@@ -18,6 +18,10 @@ app.get("/ping", (req, res) => {
   res.send("Server is awake!");
 });
 
+app.get("/", (req, res) => {
+  res.send("Server is awake!");
+});
+
 const PORT = process.env.PORT || 7000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
