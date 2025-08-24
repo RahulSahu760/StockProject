@@ -3,6 +3,7 @@ import "./Calculations.css";
 import axios from "axios";
 import CompanyTable from "../Components/CompanyTable";
 import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -17,6 +18,7 @@ const Calculations = () => {
   const [companies, setCompanies] = useState([]);
   const [selectedScaledValues, setSelectedScaledValues] = useState([]);
   const [alert, setAlert] = useState({ message: "", severity: "" });
+  const [loading, setLoading] = useState(true);
 
   const handleScaledValueChange = (updatedValues) => {
     setSelectedScaledValues(updatedValues);
@@ -50,20 +52,25 @@ const Calculations = () => {
       <div className="calculations-sidebar">
         <h3>Companies</h3>
         <ul>
-          {companies.map((company, index) => (
-            <li
-              key={index}
-              className={selectedCompany?.id === company.id ? "active" : ""}
-              onClick={() => setSelectedCompany(company)}
-            >
-              {company.name}
-            </li>
-          ))}
+          {companies && companies.length > 0 ? (
+            companies.map((company, index) => (
+              <li
+                key={index}
+                className={selectedCompany?.id === company.id ? "active" : ""}
+                onClick={() => setSelectedCompany(company)}
+              >
+                {company ? company.name : "No data"}
+              </li>
+            ))
+          ) : (
+            <li>No data available</li>
+          )}
         </ul>
       </div>
 
       {/* Content Layout */}
       <div className="calculations-content">
+        <h2>Select a company from the sidebar to perform calculations</h2>
         {selectedCompany ? (
           <div>
             <CompanyTable
@@ -72,7 +79,7 @@ const Calculations = () => {
             />
           </div>
         ) : (
-          <h2>Select a company from the sidebar to perform calculations</h2>
+          <CircularProgress />
         )}
       </div>
     </div>

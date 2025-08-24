@@ -9,6 +9,7 @@ import FunctionsIcon from "@mui/icons-material/Functions";
 // import Weightage from "../Pages/Weightage";
 import CompanyGraphPage from "./CompanyGraphPage";
 import axios from "axios";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const DashboardLayout = () => {
   const baseUrl = process.env.REACT_APP_BACKEND_URL;
@@ -92,7 +93,15 @@ const DashboardLayout = () => {
           ) : (
             <div>
               {loading ? (
-                <p>Loading companies...</p>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "50px",
+                  }}
+                >
+                  <CircularProgress />
+                </div>
               ) : error ? (
                 <p style={{ color: "red" }}>Error: {error}</p>
               ) : companies.length > 0 ? (

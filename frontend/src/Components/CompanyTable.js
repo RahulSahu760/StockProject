@@ -1,6 +1,7 @@
 import React from "react";
 import "./CompanyTable.css";
 import { Button } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
 const CompanyTable = ({ data }) => {
@@ -16,7 +17,7 @@ const CompanyTable = ({ data }) => {
   const [average, setAverage] = React.useState([]);
   const [diff, setDiff] = React.useState([]);
   const [sq, setSq] = React.useState([]);
-
+  const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
     if (data) {
       setCurrentCagr(data.cagr);
@@ -155,104 +156,116 @@ const CompanyTable = ({ data }) => {
   };
 
   return (
-    <div className="CompanyTable-container">
-      <table className="CompanyTable-table">
-        <thead>
-          <tr className="CompanyTable-headerRow">
-            <th
-              className="CompanyTable-headerCell"
-              style={{ backgroundColor: "black", color: "white" }}
-            >
-              Name: {data?.name || "N/A"}
-            </th>
-            <th
-              className="CompanyTable-headerCell"
-              style={{ backgroundColor: "black", color: "white" }}
-            >
-              Code: {data?.code || "N/A"}
-            </th>
-          </tr>
-          <tr className="CompanyTable-columnRow">
-            <th
-              className="CompanyTable-columnHeader"
-              style={{ backgroundColor: "black", color: "white" }}
-            >
-              Returns
-            </th>
-            <th
-              className="CompanyTable-columnHeader"
-              style={{ backgroundColor: "black", color: "white" }}
-            >
-              Scaled Values
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {returns.map((returnValue, index) => (
-            <tr key={index} className="CompanyTable-dataRow">
-              <td className="CompanyTable-dataCell">{returnValue}</td>
-              <td className="CompanyTable-dataCell">
-                {scaledValues[index]}{" "}
-                <input
-                  type="checkbox"
-                  value={scaledValues[index]}
-                  checked={selectedValues.some(
-                    (item) => item.value === scaledValues[index]
-                  )}
-                  onChange={() => {
-                    addRemoveSelectedValues(scaledValues[index], index);
-                  }}
-                  className="CompanyTable-checkbox"
-                  disabled={!checkBox}
-                  style={{
-                    backgroundColor: !checkBox ? "red" : "transparent", // Changes the background color when not disabled
-                    cursor: !checkBox ? "not-allowed" : "pointer", // Change cursor style when disabled
-                  }}
-                />
-              </td>
-            </tr>
-          ))}
-          <tr>
-            <td
-              className="CompanyTable-dataCell"
-              style={{ backgroundColor: "black", color: "white" }}
-            >
-              <span style={{ fontWeight: "bold" }}>Current CAGR:</span>{" "}
-              {currentCagr || "N/A"}
-            </td>
-            <td
-              className="CompanyTable-dataCell"
-              style={{ backgroundColor: "black", color: "white" }}
-            >
-              <span style={{ fontWeight: "bold" }}>
-                Current Standard Deviation:
-              </span>{" "}
-              {currentSd || "N/A"}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div>
-        <p>
-          <span style={{ fontStyle: "italic" }}>Note: </span>If no checkboxes
-          are selected, pressing the "Calculate Scaled Returns" button will
-          calculate the results for all records. If specific checkboxes are
-          selected, it will calculate the results only for those selected
-          values.
-        </p>
-      </div>
-      <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
-        <Button
-          variant="contained"
-          onClick={() => {
-            handleCheckbox();
-            addScaledReturns();
+    <div className="Continer">
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
           }}
-          disabled={!checkBox}
         >
-          Calculate Scaled Returns
-        </Button>
-        {/* <Button
+          <CircularProgress />
+        </div>
+      ) : (
+        <div className="CompanyTable-container">
+          <table className="CompanyTable-table">
+            <thead>
+              <tr className="CompanyTable-headerRow">
+                <th
+                  className="CompanyTable-headerCell"
+                  style={{ backgroundColor: "black", color: "white" }}
+                >
+                  Name: {data?.name || "N/A"}
+                </th>
+                <th
+                  className="CompanyTable-headerCell"
+                  style={{ backgroundColor: "black", color: "white" }}
+                >
+                  Code: {data?.code || "N/A"}
+                </th>
+              </tr>
+              <tr className="CompanyTable-columnRow">
+                <th
+                  className="CompanyTable-columnHeader"
+                  style={{ backgroundColor: "black", color: "white" }}
+                >
+                  Returns
+                </th>
+                <th
+                  className="CompanyTable-columnHeader"
+                  style={{ backgroundColor: "black", color: "white" }}
+                >
+                  Scaled Values
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {returns.map((returnValue, index) => (
+                <tr key={index} className="CompanyTable-dataRow">
+                  <td className="CompanyTable-dataCell">{returnValue}</td>
+                  <td className="CompanyTable-dataCell">
+                    {scaledValues[index]}{" "}
+                    <input
+                      type="checkbox"
+                      value={scaledValues[index]}
+                      checked={selectedValues.some(
+                        (item) => item.value === scaledValues[index]
+                      )}
+                      onChange={() => {
+                        addRemoveSelectedValues(scaledValues[index], index);
+                      }}
+                      className="CompanyTable-checkbox"
+                      disabled={!checkBox}
+                      style={{
+                        backgroundColor: !checkBox ? "red" : "transparent", // Changes the background color when not disabled
+                        cursor: !checkBox ? "not-allowed" : "pointer", // Change cursor style when disabled
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td
+                  className="CompanyTable-dataCell"
+                  style={{ backgroundColor: "black", color: "white" }}
+                >
+                  <span style={{ fontWeight: "bold" }}>Current CAGR:</span>{" "}
+                  {currentCagr || "N/A"}
+                </td>
+                <td
+                  className="CompanyTable-dataCell"
+                  style={{ backgroundColor: "black", color: "white" }}
+                >
+                  <span style={{ fontWeight: "bold" }}>
+                    Current Standard Deviation:
+                  </span>{" "}
+                  {currentSd || "N/A"}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div>
+            <p>
+              <span style={{ fontStyle: "italic" }}>Note: </span>If no
+              checkboxes are selected, pressing the "Calculate Scaled Returns"
+              button will calculate the results for all records. If specific
+              checkboxes are selected, it will calculate the results only for
+              those selected values.
+            </p>
+          </div>
+          <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                handleCheckbox();
+                addScaledReturns();
+              }}
+              disabled={!checkBox}
+            >
+              Calculate Scaled Returns
+            </Button>
+            {/* <Button
           variant="contained"
           onClick={() => {
             handleCheckbox();
@@ -261,60 +274,64 @@ const CompanyTable = ({ data }) => {
         >
           Calculate selected Scaled Returns
         </Button> */}
-      </div>
-      <div>
-        <table
-          border="1"
-          style={{ width: "100%", textAlign: "center", marginTop: "20px" }}
-        >
-          <thead>
-            <tr>
-              <th>Scaled Returns (SR)</th>
-              <th>Average (A)</th>
-              <th>A - SR</th>
-              <th>(A - SR)^2</th>
-            </tr>
-          </thead>
-          <tbody>
-            {selectedValues.length > 0 &&
-            selectedValues.length === average.length &&
-            selectedValues.length === diff.length &&
-            selectedValues.length === sq.length
-              ? selectedValues.map((value, index) => (
-                  <tr key={index}>
-                    <td>{value || "N/A"}</td>{" "}
-                    {/* Assuming value.value holds the scaled return */}
-                    <td>{average[index] || "N/A"}</td>
-                    <td>{diff[index] || "N/A"}</td>
-                    <td>{sq[index] || "N/A"}</td>
-                  </tr>
-                ))
-              : null}
-          </tbody>
-        </table>
-      </div>
-      <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
-        <div style={{ borderRight: "1px solid black", paddingRight: "20px" }}>
-          <label style={{ fontWeight: "bold" }}>CAGR: </label>
-          <span>{cagr}</span>
+          </div>
+          <div>
+            <table
+              border="1"
+              style={{ width: "100%", textAlign: "center", marginTop: "20px" }}
+            >
+              <thead>
+                <tr>
+                  <th>Scaled Returns (SR)</th>
+                  <th>Average (A)</th>
+                  <th>A - SR</th>
+                  <th>(A - SR)^2</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedValues.length > 0 &&
+                selectedValues.length === average.length &&
+                selectedValues.length === diff.length &&
+                selectedValues.length === sq.length
+                  ? selectedValues.map((value, index) => (
+                      <tr key={index}>
+                        <td>{value || "N/A"}</td>{" "}
+                        {/* Assuming value.value holds the scaled return */}
+                        <td>{average[index] || "N/A"}</td>
+                        <td>{diff[index] || "N/A"}</td>
+                        <td>{sq[index] || "N/A"}</td>
+                      </tr>
+                    ))
+                  : null}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
+            <div
+              style={{ borderRight: "1px solid black", paddingRight: "20px" }}
+            >
+              <label style={{ fontWeight: "bold" }}>CAGR: </label>
+              <span>{cagr}</span>
+            </div>
+            <div>
+              <label style={{ fontWeight: "bold" }}>
+                SD {"("}
+                <span>{"\u03C3"}</span>
+                {")"}:
+              </label>{" "}
+              <span>{sd}</span>
+            </div>
+          </div>
+          <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
+            <Button variant="contained" onClick={handleSave}>
+              Save
+            </Button>
+            <Button variant="contained" onClick={handleReset}>
+              Reset
+            </Button>
+          </div>
         </div>
-        <div>
-          <label style={{ fontWeight: "bold" }}>
-            SD {"("}
-            <span>{"\u03C3"}</span>
-            {")"}:
-          </label>{" "}
-          <span>{sd}</span>
-        </div>
-      </div>
-      <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
-        <Button variant="contained" onClick={handleSave}>
-          Save
-        </Button>
-        <Button variant="contained" onClick={handleReset}>
-          Reset
-        </Button>
-      </div>
+      )}
     </div>
   );
 };

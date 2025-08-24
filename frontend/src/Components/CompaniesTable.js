@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import CircularProgress from "@mui/material/CircularProgress";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
@@ -200,11 +201,6 @@ const CompanyTable = () => {
   useEffect(() => {
     fetchAllCompanies();
   }, []);
-  console.log("Companies: ", companies);
-  console.log("Fields: ", fields);
-  console.log("Add Return Company: ", addReturnCompany);
-  console.log("Add Return Values: ", addReturnValues);
-  console.log("Scaled Values: ", scaledValues);
 
   const maxReturnsLength = Math.max(
     ...companies.map((company) => company.returns.length)
@@ -238,8 +234,6 @@ const CompanyTable = () => {
       )
     );
   };
-  console.log("ARV: ", aRV);
-  console.log("ASV: ", aSV);
 
   const handleRemoveField = (index) => {
     if (!index) return;
@@ -291,9 +285,6 @@ const CompanyTable = () => {
   };
 
   const handleSaveEditReturnValues = async () => {
-    console.log("newreturnValues", selectedCompanyReturns);
-    console.log("newscaledValues", selectedCompanyScaledReturns);
-    console.log("CompanyCode", editReturnCompany);
     if (!editReturnCompany) return;
     try {
       const response = await axios.patch(
@@ -320,412 +311,447 @@ const CompanyTable = () => {
     }
   };
   return (
-    <div className="container">
-      {alert.message && showAlert && (
-        <Stack sx={{ width: "100%", mb: 2 }} spacing={2}>
-          <Alert
-            severity={alert.severity}
-            action={
-              <Button
-                color="inherit"
-                size="small"
-                onClick={() => setShowAlert(false)}
-              >
-                Close
-              </Button>
-            }
-          >
-            {alert.message}
-          </Alert>
-        </Stack>
-      )}
-      <div className="companies-section">
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
-            {/* Table Header */}
-            <TableHead>
-              <TableRow>
-                {companies.map((company, index) => (
-                  <StyledTableCell key={index} align="center" colSpan={2}>
-                    {company.name}
-                  </StyledTableCell>
-                ))}
-              </TableRow>
-              <TableRow>
-                {companies.map((_, index) => (
-                  <>
-                    <StyledTableCell key={`returns-${index}`} align="center">
-                      Returns
-                    </StyledTableCell>
-                    <StyledTableCell
-                      key={`scaledReturns-${index}`}
-                      align="center"
-                    >
-                      Scaled Returns
-                    </StyledTableCell>
-                  </>
-                ))}
-              </TableRow>
-            </TableHead>
-            {/* Table Body */}
-            <TableBody>
-              {Array.from({ length: maxReturnsLength }).map((_, rowIndex) => (
-                <StyledTableRow key={rowIndex}>
-                  {companies.map((company, columnIndex) => (
-                    <>
-                      <StyledTableCell
-                        key={`returns-${columnIndex}-${rowIndex}`}
-                        align="center"
-                      >
-                        {company.returns[rowIndex] || "--"}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        key={`scaledReturns-${columnIndex}-${rowIndex}`}
-                        align="center"
-                        style={{ borderRight: "1px solid #ddd" }}
-                      >
-                        {company.scaledReturns[rowIndex] || "--"}
-                      </StyledTableCell>
-                    </>
-                  ))}
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-      <div className="accordion-section">
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ArrowDownwardIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            <Typography component="span">Add Company</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <div className="accordion-buttons">
-              <Button className="add-field-btn" onClick={() => addField()}>
-                <AddIcon />
-                Add New Field
-              </Button>
-            </div>
-            {fields.map((field, fieldIndex) => (
-              <div key={fieldIndex} className="field-container">
-                <div className="field-inputs">
-                  <span className="input-label">Name</span>
-                  <input
-                    className="input-field"
-                    type="text"
-                    value={field.name}
-                    onChange={(event) =>
-                      handleChange(fieldIndex, event, "name")
-                    }
-                  />
-                  <span className="input-label">Code</span>
-                  <input
-                    className="input-field"
-                    type="text"
-                    value={field.code}
-                    onChange={(event) =>
-                      handleChange(fieldIndex, event, "code")
-                    }
-                  />
+    <div className="Container">
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : (
+        <div className="container">
+          {alert.message && showAlert && (
+            <Stack sx={{ width: "100%", mb: 2 }} spacing={2}>
+              <Alert
+                severity={alert.severity}
+                action={
                   <Button
-                    className="remove-field-btn"
-                    onClick={() => removeField(fieldIndex)}
+                    color="inherit"
+                    size="small"
+                    onClick={() => setShowAlert(false)}
                   >
-                    <RemoveIcon />
-                    Remove Company
+                    Close
+                  </Button>
+                }
+              >
+                {alert.message}
+              </Alert>
+            </Stack>
+          )}
+          <div className="companies-section">
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                {/* Table Header */}
+                <TableHead>
+                  <TableRow>
+                    {companies.map((company, index) => (
+                      <StyledTableCell key={index} align="center" colSpan={2}>
+                        {company.name}
+                      </StyledTableCell>
+                    ))}
+                  </TableRow>
+                  <TableRow>
+                    {companies.map((_, index) => (
+                      <>
+                        <StyledTableCell
+                          key={`returns-${index}`}
+                          align="center"
+                        >
+                          Returns
+                        </StyledTableCell>
+                        <StyledTableCell
+                          key={`scaledReturns-${index}`}
+                          align="center"
+                        >
+                          Scaled Returns
+                        </StyledTableCell>
+                      </>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                {/* Table Body */}
+                <TableBody>
+                  {Array.from({ length: maxReturnsLength }).map(
+                    (_, rowIndex) => (
+                      <StyledTableRow key={rowIndex}>
+                        {companies.map((company, columnIndex) => (
+                          <>
+                            <StyledTableCell
+                              key={`returns-${columnIndex}-${rowIndex}`}
+                              align="center"
+                            >
+                              {company.returns[rowIndex] || "--"}
+                            </StyledTableCell>
+                            <StyledTableCell
+                              key={`scaledReturns-${columnIndex}-${rowIndex}`}
+                              align="center"
+                              style={{ borderRight: "1px solid #ddd" }}
+                            >
+                              {company.scaledReturns[rowIndex] || "--"}
+                            </StyledTableCell>
+                          </>
+                        ))}
+                      </StyledTableRow>
+                    )
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+          <div className="accordion-section">
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ArrowDownwardIcon />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+              >
+                <Typography component="span">Add Company</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <div className="accordion-buttons">
+                  <Button className="add-field-btn" onClick={() => addField()}>
+                    <AddIcon />
+                    Add New Field
                   </Button>
                 </div>
-                <div className="returns-section">
-                  <span className="input-label">Returns</span>
-                  {field.returns.map((returnValue, returnIndex) => (
-                    <div className="return-field" key={returnIndex}>
+                {fields.map((field, fieldIndex) => (
+                  <div key={fieldIndex} className="field-container">
+                    <div className="field-inputs">
+                      <span className="input-label">Name</span>
                       <input
-                        className="input-return"
-                        type="number"
-                        placeholder={`Return ${returnIndex + 1}`}
-                        value={returnValue}
+                        className="input-field"
+                        type="text"
+                        value={field.name}
                         onChange={(event) =>
-                          handleReturnChange(fieldIndex, returnIndex, event)
+                          handleChange(fieldIndex, event, "name")
+                        }
+                      />
+                      <span className="input-label">Code</span>
+                      <input
+                        className="input-field"
+                        type="text"
+                        value={field.code}
+                        onChange={(event) =>
+                          handleChange(fieldIndex, event, "code")
                         }
                       />
                       <Button
-                        className="remove-return-btn"
-                        onClick={() => removeReturnField(fieldIndex)}
+                        className="remove-field-btn"
+                        onClick={() => removeField(fieldIndex)}
                       >
-                        Remove
+                        <RemoveIcon />
+                        Remove Company
                       </Button>
                     </div>
-                  ))}
-                  <Button
-                    className="add-return-btn"
-                    onClick={() => addReturnField(fieldIndex)}
-                  >
-                    Add Return Value
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </AccordionDetails>
-        </Accordion>
-      </div>
-      <div className="confirm-section">
-        <Button className="confirm-btn" onClick={saveData}>
-          Confirm
-        </Button>
-      </div>
-      <div className="accordion-section" style={{ marginTop: "20px" }}>
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ArrowDownwardIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            <Typography component="span">
-              Add Return Values To Existing Companies
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          >
-            <select
-              value={addReturnCompany}
-              placeholder="Select a company"
-              onChange={(e) => handleReturnCompanyChange(e.target.value)}
-              style={{
-                padding: "8px",
-                fontSize: "16px",
-                maxWidth: "300px",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
-            >
-              <option value="">Select a company</option>
-              {companies.map((company, index) => (
-                <option key={index} value={company.code}>
-                  {company.name}
-                </option>
-              ))}
-            </select>
-
-            <table
-              style={{
-                borderCollapse: "collapse",
-                width: "100%",
-                maxWidth: "600px",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "8px",
-                      backgroundColor: "#f0f0f0",
-                      borderBottom: "1px solid #ccc",
-                    }}
-                  >
-                    Return Values for {addReturnCompany}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {addReturnValues?.map((value, index) => (
-                  <tr key={index}>
-                    <td
-                      style={{ padding: "8px", borderBottom: "1px solid #eee" }}
-                    >
-                      {value}
-                    </td>
-                  </tr>
+                    <div className="returns-section">
+                      <span className="input-label">Returns</span>
+                      {field.returns.map((returnValue, returnIndex) => (
+                        <div className="return-field" key={returnIndex}>
+                          <input
+                            className="input-return"
+                            type="number"
+                            placeholder={`Return ${returnIndex + 1}`}
+                            value={returnValue}
+                            onChange={(event) =>
+                              handleReturnChange(fieldIndex, returnIndex, event)
+                            }
+                          />
+                          <Button
+                            className="remove-return-btn"
+                            onClick={() => removeReturnField(fieldIndex)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        className="add-return-btn"
+                        onClick={() => addReturnField(fieldIndex)}
+                      >
+                        Add Return Value
+                      </Button>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-
-            {addReturnCompany && (
-              <div
+              </AccordionDetails>
+            </Accordion>
+          </div>
+          <div className="confirm-section">
+            <Button className="confirm-btn" onClick={saveData}>
+              Confirm
+            </Button>
+          </div>
+          <div className="accordion-section" style={{ marginTop: "20px" }}>
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ArrowDownwardIcon />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+              >
+                <Typography component="span">
+                  Add Return Values To Existing Companies
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "12px",
+                  gap: "16px",
                 }}
               >
-                <div>
-                  <Button
-                    onClick={addNewField}
-                    style={{
-                      padding: "6px 12px",
-                      fontSize: "14px",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    Add Return Values
-                  </Button>
-                </div>
+                <select
+                  value={addReturnCompany}
+                  placeholder="Select a company"
+                  onChange={(e) => handleReturnCompanyChange(e.target.value)}
+                  style={{
+                    padding: "8px",
+                    fontSize: "16px",
+                    maxWidth: "300px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  <option value="">Select a company</option>
+                  {companies.map((company, index) => (
+                    <option key={index} value={company.code}>
+                      {company.name}
+                    </option>
+                  ))}
+                </select>
 
-                {aRV?.map((field, index) => (
+                <table
+                  style={{
+                    borderCollapse: "collapse",
+                    width: "100%",
+                    maxWidth: "600px",
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style={{
+                          textAlign: "left",
+                          padding: "8px",
+                          backgroundColor: "#f0f0f0",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
+                        Return Values for {addReturnCompany}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {addReturnValues?.map((value, index) => (
+                      <tr key={index}>
+                        <td
+                          style={{
+                            padding: "8px",
+                            borderBottom: "1px solid #eee",
+                          }}
+                        >
+                          {value}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {addReturnCompany && (
                   <div
-                    key={field.index}
                     style={{
                       display: "flex",
-                      alignItems: "center",
+                      flexDirection: "column",
                       gap: "12px",
                     }}
                   >
-                    <input
-                      type="number"
-                      value={field.value}
-                      onChange={(e) =>
-                        handleaRVChange(field.index, e.target.value)
-                      }
-                      style={{
-                        padding: "6px 8px",
-                        fontSize: "14px",
-                        width: "120px",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                      }}
-                    />
+                    <div>
+                      <Button
+                        onClick={addNewField}
+                        style={{
+                          padding: "6px 12px",
+                          fontSize: "14px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        Add Return Values
+                      </Button>
+                    </div>
+
+                    {aRV?.map((field, index) => (
+                      <div
+                        key={field.index}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                        }}
+                      >
+                        <input
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            handleaRVChange(field.index, e.target.value)
+                          }
+                          style={{
+                            padding: "6px 8px",
+                            fontSize: "14px",
+                            width: "120px",
+                            borderRadius: "4px",
+                            border: "1px solid #ccc",
+                          }}
+                        />
+                        <Button
+                          onClick={() => handleRemoveField(field.index)}
+                          style={{ padding: "6px 12px", fontSize: "14px" }}
+                        >
+                          Remove Field
+                        </Button>
+                      </div>
+                    ))}
+
                     <Button
-                      onClick={() => handleRemoveField(field.index)}
-                      style={{ padding: "6px 12px", fontSize: "14px" }}
+                      onClick={handleSaveaRV}
+                      style={{
+                        padding: "8px 16px",
+                        fontSize: "14px",
+                        alignSelf: "flex-start",
+                        backgroundColor: "#1976d2",
+                        color: "#fff",
+                        borderRadius: "4px",
+                        marginTop: "8px",
+                      }}
                     >
-                      Remove Field
+                      Save
                     </Button>
                   </div>
-                ))}
-
-                <Button
-                  onClick={handleSaveaRV}
-                  style={{
-                    padding: "8px 16px",
-                    fontSize: "14px",
-                    alignSelf: "flex-start",
-                    backgroundColor: "#1976d2",
-                    color: "#fff",
-                    borderRadius: "4px",
-                    marginTop: "8px",
-                  }}
-                >
-                  Save
-                </Button>
-              </div>
-            )}
-          </AccordionDetails>
-        </Accordion>
-      </div>
-      <div className="accordion-section" style={{ marginTop: "20px" }}>
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ArrowDownwardIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            <Typography component="span">Edit Return Values</Typography>
-          </AccordionSummary>
-          <AccordionDetails
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          >
-            <select
-              value={editReturnCompany}
-              placeholder="Select a company"
-              onChange={(e) => handleEditSelectedCompany(e.target.value)}
-              style={{
-                padding: "8px",
-                fontSize: "16px",
-                maxWidth: "300px",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
-            >
-              <option value="">Select a company</option>
-              {companies.map((company, index) => (
-                <option key={index} value={company.code}>
-                  {company.name}
-                </option>
-              ))}
-            </select>
-
-            <table
-              style={{
-                borderCollapse: "collapse",
-                width: "100%",
-                maxWidth: "600px",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "8px",
-                      backgroundColor: "#f0f0f0",
-                      borderBottom: "1px solid #ccc",
-                    }}
-                  >
-                    Return Values for {editReturnCompany}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedCompanyReturns?.map((value, index) => (
-                  <tr key={index}>
-                    <td
-                      style={{ padding: "8px", borderBottom: "1px solid #eee" }}
-                    >
-                      <input
-                        type="number"
-                        value={value}
-                        onChange={(e) => {
-                          const updatedValues = [...selectedCompanyReturns];
-                          updatedValues[index] = e.target.value;
-                          setSelectedCompanyReturns(updatedValues);
-                          const scaledValue = calculateScaledReturn(
-                            e.target.value
-                          );
-                          const updatedScaledValues = [
-                            ...selectedCompanyScaledReturns,
-                          ];
-                          updatedScaledValues[index] = scaledValue;
-                          setSelectedCompanyScaledReturns(updatedScaledValues);
-                        }}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {selectedCompanyReturns && (
-              <div
+                )}
+              </AccordionDetails>
+            </Accordion>
+          </div>
+          <div className="accordion-section" style={{ marginTop: "20px" }}>
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ArrowDownwardIcon />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+              >
+                <Typography component="span">Edit Return Values</Typography>
+              </AccordionSummary>
+              <AccordionDetails
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "12px",
+                  gap: "16px",
                 }}
               >
-                <Button
-                  onClick={handleSaveEditReturnValues}
+                <select
+                  value={editReturnCompany}
+                  placeholder="Select a company"
+                  onChange={(e) => handleEditSelectedCompany(e.target.value)}
                   style={{
-                    padding: "8px 16px",
-                    fontSize: "14px",
-                    alignSelf: "flex-start",
-                    backgroundColor: "#1976d2",
-                    color: "#fff",
+                    padding: "8px",
+                    fontSize: "16px",
+                    maxWidth: "300px",
                     borderRadius: "4px",
-                    marginTop: "8px",
+                    border: "1px solid #ccc",
                   }}
                 >
-                  Save
-                </Button>
-              </div>
-            )}
-          </AccordionDetails>
-        </Accordion>
-      </div>
+                  <option value="">Select a company</option>
+                  {companies.map((company, index) => (
+                    <option key={index} value={company.code}>
+                      {company.name}
+                    </option>
+                  ))}
+                </select>
+
+                <table
+                  style={{
+                    borderCollapse: "collapse",
+                    width: "100%",
+                    maxWidth: "600px",
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style={{
+                          textAlign: "left",
+                          padding: "8px",
+                          backgroundColor: "#f0f0f0",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
+                        Return Values for {editReturnCompany}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCompanyReturns?.map((value, index) => (
+                      <tr key={index}>
+                        <td
+                          style={{
+                            padding: "8px",
+                            borderBottom: "1px solid #eee",
+                          }}
+                        >
+                          <input
+                            type="number"
+                            value={value}
+                            onChange={(e) => {
+                              const updatedValues = [...selectedCompanyReturns];
+                              updatedValues[index] = e.target.value;
+                              setSelectedCompanyReturns(updatedValues);
+                              const scaledValue = calculateScaledReturn(
+                                e.target.value
+                              );
+                              const updatedScaledValues = [
+                                ...selectedCompanyScaledReturns,
+                              ];
+                              updatedScaledValues[index] = scaledValue;
+                              setSelectedCompanyScaledReturns(
+                                updatedScaledValues
+                              );
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {selectedCompanyReturns && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "12px",
+                    }}
+                  >
+                    <Button
+                      onClick={handleSaveEditReturnValues}
+                      style={{
+                        padding: "8px 16px",
+                        fontSize: "14px",
+                        alignSelf: "flex-start",
+                        backgroundColor: "#1976d2",
+                        color: "#fff",
+                        borderRadius: "4px",
+                        marginTop: "8px",
+                      }}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                )}
+              </AccordionDetails>
+            </Accordion>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

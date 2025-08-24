@@ -2,6 +2,7 @@ import { Card, Alert } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const baseUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -11,6 +12,7 @@ const PortfolioSD = () => {
   const [psd, setPSD] = useState(0);
   const [error, setError] = useState("");
   const [correlations, setCorrelations] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
