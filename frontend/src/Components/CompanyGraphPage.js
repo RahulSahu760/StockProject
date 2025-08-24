@@ -11,39 +11,37 @@ import {
 } from "recharts";
 
 const CompanyGraphPage = ({ companies }) => {
-  // const baseUrl = process.env.REACT_APP_BACKEND_URL;
+  // helper to safely format numbers
+  const formatNum = (val, digits = 2) =>
+    typeof val === "number" ? val.toFixed(digits) : "N/A";
 
-  const [selectedCompany, setSelectedCompany] = useState(companies[0]);
-  // const [companies, setCompanies] = useState([]);
-  //     const [loading, setLoading] = useState(true);
-  //     const [error, setError] = useState(null);
-
-  //     const fetchAllCompanies = async () => {
-  //       try {
-  //         const response = await axios.get(`${baseUrl}/api/companies/fetch`);
-  //         if (response.data) {
-  //           setCompanies(response.data);
-  //           setLoading(false);
-  //         }
-  //       } catch (error) {
-  //         setError(error);
-  //         setLoading(false);
-  //       }
-  //     };
-  //     useEffect(() => {
-  //       fetchAllCompanies();
-  //     }, []);
+  // initialize state safely
+  const [selectedCompany, setSelectedCompany] = useState(
+    companies?.[0] ?? null
+  );
 
   const handleSelectChange = (e) => {
     const selected = companies.find((c) => c.code === e.target.value);
-    setSelectedCompany(selected);
+    setSelectedCompany(selected ?? null);
   };
 
-  const chartData = selectedCompany.returns.map((val, i) => ({
-    period: `Q${i + 1}`,
-    Return: val,
-    ScaledReturn: selectedCompany.scaledReturns[i],
-  }));
+  // chart data safe mapping
+  const chartData =
+    selectedCompany?.returns?.map((val, i) => ({
+      period: `Q${i + 1}`,
+      Return: val,
+      ScaledReturn: selectedCompany?.scaledReturns?.[i],
+    })) ?? [];
+
+  // if no company data at all
+  if (!selectedCompany) {
+    return (
+      <div style={{ padding: "30px", fontFamily: "Segoe UI" }}>
+        <h2>📈 Company Returns Dashboard</h2>
+        <p>No company data available</p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -65,13 +63,14 @@ const CompanyGraphPage = ({ companies }) => {
         📈 Company Returns Dashboard
       </h2>
 
+      {/* Company selector */}
       <div style={{ textAlign: "center", marginBottom: "25px" }}>
         <label style={{ fontWeight: "600", marginRight: "10px" }}>
           Select Company:
         </label>
         <select
           onChange={handleSelectChange}
-          value={selectedCompany.code}
+          value={selectedCompany?.code ?? ""}
           style={{
             padding: "8px 12px",
             fontSize: "16px",
@@ -79,11 +78,15 @@ const CompanyGraphPage = ({ companies }) => {
             border: "1px solid #ccc",
           }}
         >
-          {companies.map((company) => (
-            <option key={company._id} value={company.code}>
-              {company.name}
-            </option>
-          ))}
+          {companies?.length > 0 ? (
+            companies.map((company) => (
+              <option key={company._id} value={company.code}>
+                {company.name}
+              </option>
+            ))
+          ) : (
+            <option disabled>No companies</option>
+          )}
         </select>
       </div>
 
@@ -109,16 +112,16 @@ const CompanyGraphPage = ({ companies }) => {
             🏢 Company Info
           </h3>
           <p>
-            <strong>Name:</strong> {selectedCompany.name}
+            <strong>Name:</strong> {selectedCompany?.name ?? "N/A"}
           </p>
           <p>
-            <strong>Code:</strong> {selectedCompany.code}
+            <strong>Code:</strong> {selectedCompany?.code ?? "N/A"}
           </p>
           <p>
-            <strong>CAGR:</strong> {selectedCompany.cagr.toFixed(2)}
+            <strong>CAGR:</strong> {formatNum(selectedCompany?.cagr, 2)}
           </p>
           <p>
-            <strong>SD:</strong> {selectedCompany.sd.toFixed(3)}
+            <strong>SD:</strong> {formatNum(selectedCompany?.sd, 3)}
           </p>
         </div>
 
@@ -170,42 +173,39 @@ const CompanyGraphPage = ({ companies }) => {
         <h3 style={{ marginBottom: "15px", color: "#444" }}>
           📌 Latest Share Details
         </h3>
-        {selectedCompany.shareDetails.length > 0 && (
-          <div
-            style={{
-              padding: "12px 0",
-              borderBottom: "none",
-            }}
-          >
-            {(() => {
-              const latest =
-                selectedCompany.shareDetails[
-                  selectedCompany.shareDetails.length - 1
-                ];
-              return (
-                <>
+        {selectedCompany?.shareDetails?.length > 0 ? (
+          (() => {
+            const latest =
+              selectedCompany.shareDetails[
+                selectedCompany.shareDetails.length - 1
+              ];
+            return (
+              <>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {latest?.date
+                    ? new Date(latest.date).toLocaleDateString()
+                    : "N/A"}
+                </p>
+                <p>
+                  <strong>Rate:</strong> {latest?.rate ?? "N/A"}
+                </p>
+                <p>
+                  <strong>Quantity:</strong> {latest?.quantity ?? "N/A"}
+                </p>
+                <p>
+                  <strong>Total Value:</strong> {latest?.totalValue ?? "N/A"}
+                </p>
+                {latest?.weightage !== undefined && (
                   <p>
-                    <strong>Date:</strong>{" "}
-                    {new Date(latest.date).toLocaleDateString()}
+                    <strong>Weightage:</strong> {formatNum(latest.weightage, 2)}
                   </p>
-                  <p>
-                    <strong>Rate:</strong> {latest.rate}
-                  </p>
-                  <p>
-                    <strong>Quantity:</strong> {latest.quantity}
-                  </p>
-                  <p>
-                    <strong>Total Value:</strong> {latest.totalValue}
-                  </p>
-                  {latest.weightage && (
-                    <p>
-                      <strong>Weightage:</strong> {latest.weightage.toFixed(2)}
-                    </p>
-                  )}
-                </>
-              );
-            })()}
-          </div>
+                )}
+              </>
+            );
+          })()
+        ) : (
+          <p>No share details available</p>
         )}
       </div>
     </div>
