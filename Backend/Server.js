@@ -14,10 +14,6 @@ app.use(cors());
 
 app.use("/api/companies", companyRoutes);
 
-app.get("/ping", (req, res) => {
-  res.send("Server is awake!");
-});
-
 app.get("/", (req, res) => {
   res.send("Server is awake!");
 });
